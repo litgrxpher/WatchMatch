@@ -18,16 +18,16 @@ export function Footer() {
               <circle cx="14" cy="8" r="4" fill="currentColor" fillOpacity="0.7" />
               <circle cx="12" cy="14" r="4" fill="currentColor" fillOpacity="0.9" />
             </svg>
-          <p>&copy; 2025 Litgrxpher. All rights reserved.</p>
+          <p>&copy;<strong>Litgrxpher, 2025</strong></p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="#" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
+          <Link href="https://github.com/litgrxpher" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
             <Github className="h-5 w-5" />
           </Link>
-          <Link href="#" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
+          <Link href="https://www.instagram.com/litgrxpher/#" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
             <Instagram className="h-5 w-5" />
           </Link>
-          <Link href="#" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
+          <Link href="https://www.linkedin.com/in/csadharsh/" className="p-2 rounded-full hover:bg-accent/20 transition-colors">
             <Linkedin className="h-5 w-5" />
           </Link>
         </div>
