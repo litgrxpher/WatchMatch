@@ -55,7 +55,7 @@ export function WatchMatchQuiz() {
 
   return (
     <section>
-      <Card className="bg-card/30 backdrop-blur-xl border-white/20 shadow-lg">
+      <Card className="bg-card/20 backdrop-blur-xl border-white/20 shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Wand2 className="h-8 w-8 text-primary" />
