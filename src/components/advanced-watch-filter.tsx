@@ -12,8 +12,11 @@ import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
 import type { FeatureFinderOutput, FeatureFinderInput } from '@/ai/schemas/feature-finder-schemas';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
-const featureOptions = ['Chronograph', 'Date', 'Water Resistance', 'Tachymeter', 'GMT', 'Moonphase', 'Perpetual Calendar', 'Tourbillon'];
+const featureOptions = ['Chronograph', 'GMT', 'Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 'Power Reserve Indicator'];
+const healthFeatureOptions = ['Heart Rate Monitor', 'SpO2 Sensor', 'Sleep Tracking', 'ECG', 'GPS'];
+
 
 export function AdvancedWatchFilter() {
   const [filters, setFilters] = useState<FeatureFinderInput>({
@@ -25,7 +28,7 @@ export function AdvancedWatchFilter() {
     waterResistance: 'any',
     glassType: 'all',
     features: [],
-    priceRange: [0, 400000],
+    priceRange: [0, 500000],
     caseSize: [36, 44],
   });
   const [loading, setLoading] = useState(false);
@@ -33,6 +36,15 @@ export function AdvancedWatchFilter() {
   const { toast } = useToast();
 
   const handleFeatureChange = (feature: string) => {
+    setFilters(prev => {
+        const newFeatures = prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature];
+        return {...prev, features: newFeatures};
+    });
+  };
+  
+  const handleHealthFeatureChange = (feature: string) => {
     setFilters(prev => {
         const newFeatures = prev.features.includes(feature)
         ? prev.features.filter(f => f !== feature)
@@ -73,7 +85,7 @@ export function AdvancedWatchFilter() {
       waterResistance: 'any',
       glassType: 'all',
       features: [],
-      priceRange: [0, 400000],
+      priceRange: [0, 500000],
       caseSize: [36, 44],
     });
     setResult(null);
@@ -87,7 +99,7 @@ export function AdvancedWatchFilter() {
             <Filter className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold font-headline">FeatureFinder AI</CardTitle>
-          <CardDescription className="text-md">Use AI to filter our collection and find the watch with your desired specs.</CardDescription>
+          <CardDescription className="text-md">Use our extensive filters to find the watch with your exact desired specs.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
@@ -100,7 +112,7 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="all">Any Movement</SelectItem>
                   <SelectItem value="Automatic">Automatic</SelectItem>
                   <SelectItem value="Quartz">Quartz</SelectItem>
-                  <SelectItem value="Manual">Manual</SelectItem>
+                  <SelectItem value="Manual">Manual Wind</SelectItem>
                   <SelectItem value="Smart">Smart</SelectItem>
                 </SelectContent>
               </Select>
@@ -114,7 +126,7 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Stainless Steel">Stainless Steel</SelectItem>
                   <SelectItem value="Titanium">Titanium</SelectItem>
                   <SelectItem value="Ceramic">Ceramic</SelectItem>
-                  <SelectItem value="Carbon fiber">Carbon Fiber</SelectItem>
+                  <SelectItem value="Carbon Fiber">Carbon Fiber</SelectItem>
                   <SelectItem value="Gold">Gold</SelectItem>
                   <SelectItem value="Bronze">Bronze</SelectItem>
                   <SelectItem value="Platinum">Platinum</SelectItem>
@@ -147,6 +159,8 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="White">White</SelectItem>
                   <SelectItem value="Green">Green</SelectItem>
                   <SelectItem value="Silver">Silver</SelectItem>
+                  <SelectItem value="Red">Red</SelectItem>
+                  <SelectItem value="Brown">Brown</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -170,9 +184,10 @@ export function AdvancedWatchFilter() {
                 <SelectTrigger id="waterResistance"><SelectValue placeholder="Select water resistance" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="any">Any</SelectItem>
-                  <SelectItem value="Up to 50m">Up to 50m</SelectItem>
-                  <SelectItem value="100m">100m</SelectItem>
-                  <SelectItem value="200m+">200m+</SelectItem>
+                  <SelectItem value="30m">30m (Splash resistant)</SelectItem>
+                  <SelectItem value="50m">50m (Light swimming)</SelectItem>
+                  <SelectItem value="100m">100m (Swimming/Snorkeling)</SelectItem>
+                  <SelectItem value="200m+">200m+ (Diving)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -189,13 +204,13 @@ export function AdvancedWatchFilter() {
               </Select>
             </div>
             <div className="space-y-3">
-              <Label>Price Range: ₹{filters.priceRange[0]} - ₹{filters.priceRange[1] >= 400000 ? '400000+' : filters.priceRange[1]}</Label>
+              <Label>Price Range: ₹{filters.priceRange[0]} - ₹{filters.priceRange[1] >= 500000 ? '500,000+' : filters.priceRange[1]}</Label>
               <Slider
                 value={filters.priceRange}
                 onValueChange={(v) => handleFilterChange('priceRange', v)}
                 min={0}
-                max={400000}
-                step={5000}
+                max={500000}
+                step={10000}
               />
             </div>
              <div className="space-y-3">
@@ -209,8 +224,8 @@ export function AdvancedWatchFilter() {
               />
             </div>
             
-            <div className="md:col-span-2 lg:col-span-3">
-              <Label>Complications</Label>
+            <div className="md:col-span-3">
+              <Label>Complications (Mechanical/Quartz)</Label>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
                 {featureOptions.map(feature => (
                   <div key={feature} className="flex items-center space-x-2">
@@ -218,6 +233,24 @@ export function AdvancedWatchFilter() {
                       id={feature}
                       checked={filters.features.includes(feature)}
                       onCheckedChange={() => handleFeatureChange(feature)}
+                    />
+                    <label htmlFor={feature} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      {feature}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:col-span-3">
+              <Label>Smartwatch Features</Label>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                {healthFeatureOptions.map(feature => (
+                  <div key={feature} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={feature}
+                      checked={filters.features.includes(feature)}
+                      onCheckedChange={() => handleHealthFeatureChange(feature)}
                     />
                     <label htmlFor={feature} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       {feature}
@@ -250,6 +283,9 @@ export function AdvancedWatchFilter() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
                     <Card key={watch.name} className="overflow-hidden group">
+                        <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                          <Image src={watch.imageUrl} alt={`${watch.brand} ${watch.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint="watch"/>
+                        </div>
                         <CardContent className="p-4">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>

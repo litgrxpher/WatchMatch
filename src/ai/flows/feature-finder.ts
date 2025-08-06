@@ -35,9 +35,9 @@ User Criteria:
 - Strap Type: {{{strapType}}}
 - Water Resistance: {{{waterResistance}}}
 - Glass Type: {{{glassType}}}
-- Desired Complications: {{#if features}}{{#each features}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified{{/if}}
+- Desired Complications and Features: {{#if features}}{{#each features}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified{{/if}}
 
-Provide your response in the requested JSON format. For the 'imageUrl', provide a valid placeholder image URL from 'https://placehold.co'.
+Provide your response in the requested JSON format. For the 'imageUrl', provide a valid placeholder image URL from 'https://placehold.co' with a size of 400x300.
 `,
 });
 
