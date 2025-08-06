@@ -55,7 +55,7 @@ export function WatchMatchQuiz() {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-card/30 backdrop-blur-xl border-white/20 shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Wand2 className="h-8 w-8 text-primary" />
@@ -147,16 +147,17 @@ export function WatchMatchQuiz() {
       )}
 
       {result && (
-        <Card className="mt-8 animate-fade-in">
+        <Card className="mt-8 animate-fade-in bg-card/30 backdrop-blur-xl border-white/20 shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Your Watch Recommendations</CardTitle>
+
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
               <h3 className="font-semibold text-lg mb-2">Suggested Watches:</h3>
               <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {result.suggestedWatches.split(',').map((watch, index) => (
-                  <li key={index} className="p-4 bg-background rounded-lg border">
+                  <li key={index} className="p-4 bg-background/50 rounded-lg border border-white/10">
                     {watch.trim()}
                   </li>
                 ))}
