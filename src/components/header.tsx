@@ -27,7 +27,7 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2">
           <WatchIcon />
-          <span className="text-xl font-bold text-foreground">WatchSavvy AI</span>
+          <span className="text-xl font-bold text-foreground">WatchBuddy</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="#quiz" className="text-muted-foreground hover:text-foreground transition-colors">AI Quiz</a>

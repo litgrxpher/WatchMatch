@@ -60,7 +60,7 @@ export function WatchMatchQuiz() {
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Wand2 className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">WatchMatch AI Quiz</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">WatchMatch</CardTitle>
           <CardDescription className="text-md">Answer a few questions and our AI will find your perfect watch.</CardDescription>
         </CardHeader>
         <CardContent>

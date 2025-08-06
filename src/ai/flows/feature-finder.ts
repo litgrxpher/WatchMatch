@@ -21,7 +21,7 @@ const prompt = ai.definePrompt({
   input: {schema: FeatureFinderInputSchema},
   output: {schema: FeatureFinderOutputSchema},
   prompt: `You are an expert watch concierge. Based on the user's criteria, suggest up to 8 specific watch models (brand and name).
-For each suggestion, provide a brief, one-sentence reason why it's a good fit.
+For each suggestion, provide a brief, one-sentence reason why it's a good fit, and a valid URL to a website where the watch can be purchased.
 If a filter is set to 'all', 'any', or is an empty string, it means the user has no preference for that category.
 The user has specified the price in Indian Rupees (INR).
 
@@ -37,7 +37,7 @@ User Criteria:
 - Glass Type: {{{glassType}}}
 - Desired Complications and Features: {{#if features}}{{#each features}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified{{/if}}
 
-Provide your response in the requested JSON format. For the 'imageUrl', provide a valid placeholder image URL from 'https://placehold.co' with a size of 400x300.
+Provide your response in the requested JSON format.
 `,
 });
 

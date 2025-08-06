@@ -2,18 +2,18 @@
 "use client";
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Filter, Loader2, Sparkles } from 'lucide-react';
+import { Filter, Loader2, Sparkles, ShoppingCart } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
 import type { FeatureFinderOutput, FeatureFinderInput } from '@/ai/schemas/feature-finder-schemas';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
 import { Input } from './ui/input';
+import Link from 'next/link';
 
 const featureOptions = ['Chronograph', 'GMT', 'Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 'Power Reserve Indicator'];
 const healthFeatureOptions = ['Heart Rate Monitor', 'SpO2 Sensor', 'Sleep Tracking', 'ECG', 'GPS'];
@@ -132,7 +132,7 @@ export function AdvancedWatchFilter() {
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Filter className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">FeatureFinder AI</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">Feature Finder</CardTitle>
           <CardDescription className="text-md">Use our extensive filters to find the watch with your exact desired specs.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -344,12 +344,20 @@ export function AdvancedWatchFilter() {
                 <h2 className="text-2xl font-bold text-center mb-8">AI Watch Suggestions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
-                    <Card key={watch.name} className="overflow-hidden group">
-                        <CardContent className="p-4">
+                    <Card key={watch.name} className="overflow-hidden group flex flex-col">
+                        <CardContent className="p-4 flex flex-col flex-grow">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">{watch.reason}</p>
+                            <p className="text-sm text-muted-foreground mt-1 flex-grow">{watch.reason}</p>
                         </CardContent>
+                        <CardFooter>
+                          <Button asChild className="w-full">
+                            <Link href={watch.purchaseUrl} target="_blank" rel="noopener noreferrer">
+                              <ShoppingCart className="mr-2 h-4 w-4" />
+                              Buy Now
+                            </Link>
+                          </Button>
+                        </CardFooter>
                     </Card>
                     ))}
                 </div>
