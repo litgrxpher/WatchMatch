@@ -1,64 +1,75 @@
+
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Filter } from 'lucide-react';
+import { Filter, Loader2, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
+import { Slider } from './ui/slider';
+import { featureFinder } from '@/ai/flows/feature-finder';
+import type { FeatureFinderOutput, FeatureFinderInput } from '@/ai/schemas/feature-finder-schemas';
+import { useToast } from '@/hooks/use-toast';
 
-type Watch = {
-  id: number;
-  name: string;
-  brand: string;
-  image: string;
-  dataAiHint: string;
-  movement: 'Automatic' | 'Quartz' | 'Manual';
-  material: 'Stainless Steel' | 'Gold' | 'Titanium' | 'Ceramic';
-  features: string[];
-};
-
-const mockWatches: Watch[] = [
-  { id: 1, name: 'Submariner', brand: 'Rolex', image: 'https://placehold.co/400x400.png', dataAiHint: 'dive watch', movement: 'Automatic', material: 'Stainless Steel', features: ['Date', 'Water Resistance'] },
-  { id: 2, name: 'Speedmaster Moonwatch', brand: 'Omega', image: 'https://placehold.co/400x400.png', dataAiHint: 'chronograph watch', movement: 'Manual', material: 'Stainless Steel', features: ['Chronograph', 'Tachymeter'] },
-  { id: 3, name: 'Tank Must', brand: 'Cartier', image: 'https://placehold.co/400x400.png', dataAiHint: 'dress watch', movement: 'Quartz', material: 'Gold', features: ['Classic Design'] },
-  { id: 4, name: 'Royal Oak', brand: 'Audemars Piguet', image: 'https://placehold.co/400x400.png', dataAiHint: 'luxury watch', movement: 'Automatic', material: 'Stainless Steel', features: ['Date', 'Integrated Bracelet'] },
-  { id: 5, name: 'Pelagos', brand: 'Tudor', image: 'https://placehold.co/400x400.png', dataAiHint: 'tool watch', movement: 'Automatic', material: 'Titanium', features: ['Date', 'Water Resistance', 'Helium Escape Valve'] },
-  { id: 6, name: 'Navitimer B01', brand: 'Breitling', image: 'https://placehold.co/400x400.png', dataAiHint: 'pilot watch', movement: 'Automatic', material: 'Stainless Steel', features: ['Chronograph', 'Slide Rule'] },
-  { id: 7, name: 'BR 03-92', brand: 'Bell & Ross', image: 'https://placehold.co/400x400.png', dataAiHint: 'square watch', movement: 'Automatic', material: 'Ceramic', features: ['Date'] },
-  { id: 8, name: 'Reverso Classic', brand: 'Jaeger-LeCoultre', image: 'https://placehold.co/400x400.png', dataAiHint: 'art deco', movement: 'Manual', material: 'Stainless Steel', features: ['Reversible Case'] },
-];
-
-const featureOptions = ['Chronograph', 'Date', 'Water Resistance', 'Tachymeter', 'GMT'];
+const featureOptions = ['Chronograph', 'Date', 'Water Resistance', 'Tachymeter', 'GMT', 'Moonphase', 'Perpetual Calendar'];
 
 export function AdvancedWatchFilter() {
-  const [movement, setMovement] = useState('all');
-  const [material, setMaterial] = useState('all');
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  
+  const [filters, setFilters] = useState<FeatureFinderInput>({
+    movement: 'all',
+    material: 'all',
+    style: 'all',
+    features: [],
+    priceRange: [0, 5000],
+    caseSize: [36, 44],
+  });
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<FeatureFinderOutput | null>(null);
+  const { toast } = useToast();
+
   const handleFeatureChange = (feature: string) => {
-    setSelectedFeatures(prev =>
-      prev.includes(feature)
-        ? prev.filter(f => f !== feature)
-        : [...prev, feature]
-    );
+    setFilters(prev => {
+        const newFeatures = prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature];
+        return {...prev, features: newFeatures};
+    });
   };
 
-  const filteredWatches = useMemo(() => {
-    return mockWatches.filter(watch => {
-      const movementMatch = movement === 'all' || watch.movement === movement;
-      const materialMatch = material === 'all' || watch.material === material;
-      const featureMatch = selectedFeatures.length === 0 || selectedFeatures.every(f => watch.features.includes(f));
-      return movementMatch && materialMatch && featureMatch;
-    });
-  }, [movement, material, selectedFeatures]);
+  const handleFilterChange = (key: keyof FeatureFinderInput, value: any) => {
+      setFilters(prev => ({...prev, [key]: value}));
+  }
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setResult(null);
+    try {
+      const searchResult = await featureFinder(filters);
+      setResult(searchResult);
+    } catch (e) {
+      console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An error occurred while getting watch suggestions. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const resetFilters = () => {
-    setMovement('all');
-    setMaterial('all');
-    setSelectedFeatures([]);
+    setFilters({
+        movement: 'all',
+        material: 'all',
+        style: 'all',
+        features: [],
+        priceRange: [0, 5000],
+        caseSize: [36, 44],
+    });
+    setResult(null);
   }
 
   return (
@@ -68,19 +79,18 @@ export function AdvancedWatchFilter() {
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Filter className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">FeatureFinder</CardTitle>
-          <CardDescription className="text-md">Filter our collection to find the watch with your desired specs.</CardDescription>
+          <CardTitle className="text-3xl font-bold font-headline">FeatureFinder AI</CardTitle>
+          <CardDescription className="text-md">Use AI to filter our collection and find the watch with your desired specs.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 border-b pb-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
+            {/* Filters */}
             <div>
               <Label htmlFor="movement">Movement</Label>
-              <Select value={movement} onValueChange={setMovement}>
-                <SelectTrigger id="movement">
-                  <SelectValue placeholder="Select movement" />
-                </SelectTrigger>
+              <Select value={filters.movement} onValueChange={(v) => handleFilterChange('movement', v)}>
+                <SelectTrigger id="movement"><SelectValue placeholder="Select movement" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Movements</SelectItem>
+                  <SelectItem value="all">Any Movement</SelectItem>
                   <SelectItem value="Automatic">Automatic</SelectItem>
                   <SelectItem value="Quartz">Quartz</SelectItem>
                   <SelectItem value="Manual">Manual</SelectItem>
@@ -89,27 +99,63 @@ export function AdvancedWatchFilter() {
             </div>
             <div>
               <Label htmlFor="material">Material</Label>
-              <Select value={material} onValueChange={setMaterial}>
-                <SelectTrigger id="material">
-                  <SelectValue placeholder="Select material" />
-                </SelectTrigger>
+              <Select value={filters.material} onValueChange={(v) => handleFilterChange('material', v)}>
+                <SelectTrigger id="material"><SelectValue placeholder="Select material" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Materials</SelectItem>
+                  <SelectItem value="all">Any Material</SelectItem>
                   <SelectItem value="Stainless Steel">Stainless Steel</SelectItem>
                   <SelectItem value="Gold">Gold</SelectItem>
                   <SelectItem value="Titanium">Titanium</SelectItem>
                   <SelectItem value="Ceramic">Ceramic</SelectItem>
+                  <SelectItem value="Bronze">Bronze</SelectItem>
+                  <SelectItem value="Platinum">Platinum</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-1 lg:col-span-2">
+             <div>
+              <Label htmlFor="style">Style</Label>
+              <Select value={filters.style} onValueChange={(v) => handleFilterChange('style', v)}>
+                <SelectTrigger id="style"><SelectValue placeholder="Select style" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Style</SelectItem>
+                  <SelectItem value="Dive">Dive</SelectItem>
+                  <SelectItem value="Dress">Dress</SelectItem>
+                  <SelectItem value="Pilot">Pilot</SelectItem>
+                  <SelectItem value="Field">Field</SelectItem>
+                  <SelectItem value="Racing">Racing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1] === 5000 ? '5000+' : filters.priceRange[1]}</Label>
+              <Slider
+                value={filters.priceRange}
+                onValueChange={(v) => handleFilterChange('priceRange', v)}
+                min={0}
+                max={5000}
+                step={100}
+              />
+            </div>
+             <div className="space-y-3">
+              <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
+              <Slider
+                value={filters.caseSize}
+                onValueChange={(v) => handleFilterChange('caseSize', v)}
+                min={30}
+                max={50}
+                step={1}
+              />
+            </div>
+            
+            <div className="md:col-span-2 lg:col-span-3">
               <Label>Features</Label>
-              <div className="flex flex-wrap items-center gap-4 mt-2">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
                 {featureOptions.map(feature => (
                   <div key={feature} className="flex items-center space-x-2">
                     <Checkbox
                       id={feature}
-                      checked={selectedFeatures.includes(feature)}
+                      checked={filters.features.includes(feature)}
                       onCheckedChange={() => handleFeatureChange(feature)}
                     />
                     <label htmlFor={feature} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -119,37 +165,57 @@ export function AdvancedWatchFilter() {
                 ))}
               </div>
             </div>
-            <div className="md:col-span-3 lg:col-span-4 flex justify-end">
+          </div>
+           <div className="flex justify-center gap-4">
                 <Button variant="ghost" onClick={resetFilters}>Reset Filters</Button>
+                <Button onClick={handleSearch} disabled={loading} size="lg">
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Finding Watches...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Find Matches with AI
+                    </>
+                  )}
+                </Button>
             </div>
-          </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredWatches.map(watch => (
-              <Card key={watch.id} className="overflow-hidden group">
-                <CardContent className="p-0">
-                  <div className="aspect-square overflow-hidden">
-                    <Image
-                      src={watch.image}
-                      alt={`${watch.brand} ${watch.name}`}
-                      width={400}
-                      height={400}
-                      data-ai-hint={watch.dataAiHint}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
-                    <h3 className="text-lg font-semibold">{watch.name}</h3>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          {filteredWatches.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
+          {result && (
+             <div className="mt-12">
+                <h2 className="text-2xl font-bold text-center mb-8">AI Watch Suggestions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {result.watches.map(watch => (
+                    <Card key={watch.name} className="overflow-hidden group">
+                        <CardContent className="p-0">
+                        <div className="aspect-square overflow-hidden bg-muted">
+                            <Image
+                            src={`https://placehold.co/400x400.png`}
+                            alt={`${watch.brand} ${watch.name}`}
+                            width={400}
+                            height={400}
+                            data-ai-hint={`${watch.style} watch`}
+                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <div className="p-4">
+                            <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
+                            <h3 className="text-lg font-semibold">{watch.name}</h3>
+                            <p className="text-sm text-muted-foreground mt-1">{watch.reason}</p>
+                        </div>
+                        </CardContent>
+                    </Card>
+                    ))}
+                </div>
+             </div>
+          )}
+
+          {result && result.watches.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground mt-8">
               <p>No watches match your criteria.</p>
-              <p className="text-sm">Try adjusting your filters.</p>
+              <p className="text-sm">Try adjusting your filters and searching again.</p>
             </div>
           )}
         </CardContent>
