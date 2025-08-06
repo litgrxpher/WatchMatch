@@ -126,7 +126,7 @@ export function AdvancedWatchFilter() {
   }
 
   return (
-    <section id="filter" className="scroll-mt-20">
+    <section>
       <Card>
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
