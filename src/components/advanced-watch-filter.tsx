@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -22,7 +21,7 @@ export function AdvancedWatchFilter() {
     material: 'all',
     style: 'all',
     features: [],
-    priceRange: [0, 5000],
+    priceRange: [0, 400000],
     caseSize: [36, 44],
   });
   const [loading, setLoading] = useState(false);
@@ -66,7 +65,7 @@ export function AdvancedWatchFilter() {
         material: 'all',
         style: 'all',
         features: [],
-        priceRange: [0, 5000],
+        priceRange: [0, 400000],
         caseSize: [36, 44],
     });
     setResult(null);
@@ -128,13 +127,13 @@ export function AdvancedWatchFilter() {
             </div>
 
             <div className="space-y-3">
-              <Label>Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1] >= 5000 ? '5000+' : filters.priceRange[1]}</Label>
+              <Label>Price Range: ₹{filters.priceRange[0]} - ₹{filters.priceRange[1] >= 400000 ? '400000+' : filters.priceRange[1]}</Label>
               <Slider
                 value={filters.priceRange}
                 onValueChange={(v) => handleFilterChange('priceRange', v)}
                 min={0}
-                max={5000}
-                step={100}
+                max={400000}
+                step={5000}
               />
             </div>
              <div className="space-y-3">
