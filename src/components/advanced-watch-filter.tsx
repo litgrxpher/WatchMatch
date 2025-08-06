@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Filter, Loader2, Sparkles, ShoppingCart } from 'lucide-react';
+import { Filter, Loader2, Sparkles, Search } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
@@ -78,12 +78,12 @@ export function AdvancedWatchFilter() {
     setLoading(true);
     setResult(null);
 
-    const finalFilters = { ...filters };
-    for (const key in otherValues) {
-        if (filters[key as keyof typeof filters] === OTHER_VALUE) {
-            finalFilters[key as keyof typeof finalFilters] = otherValues[key as keyof typeof otherValues];
+    const finalFilters: FeatureFinderInput = { ...filters };
+    (Object.keys(otherValues) as Array<keyof typeof otherValues>).forEach(key => {
+        if (filters[key] === OTHER_VALUE) {
+            finalFilters[key as keyof FeatureFinderInput] = otherValues[key];
         }
-    }
+    });
 
     try {
       const searchResult = await featureFinder(finalFilters);
@@ -352,9 +352,9 @@ export function AdvancedWatchFilter() {
                         </CardContent>
                         <CardFooter>
                           <Button asChild className="w-full">
-                            <Link href={watch.purchaseUrl} target="_blank" rel="noopener noreferrer">
-                              <ShoppingCart className="mr-2 h-4 w-4" />
-                              Buy Now
+                            <Link href={`https://www.google.com/search?q=${encodeURIComponent(watch.brand + ' ' + watch.name)}`} target="_blank" rel="noopener noreferrer">
+                              <Search className="mr-2 h-4 w-4" />
+                              Search on Google
                             </Link>
                           </Button>
                         </CardFooter>
