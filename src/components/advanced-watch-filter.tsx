@@ -127,7 +127,7 @@ export function AdvancedWatchFilter() {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-transparent backdrop-blur-xl border-white/20 shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Filter className="h-8 w-8 text-primary" />
@@ -344,7 +344,7 @@ export function AdvancedWatchFilter() {
                 <h2 className="text-2xl font-bold text-center mb-8">AI Watch Suggestions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
-                    <Card key={watch.name} className="overflow-hidden group flex flex-col">
+                    <Card key={watch.name} className="overflow-hidden group flex flex-col bg-transparent backdrop-blur-xl border-white/20 shadow-lg">
                         <CardContent className="p-4 flex flex-col flex-grow">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>
