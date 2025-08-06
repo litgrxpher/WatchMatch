@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -99,7 +100,7 @@ export function WatchMatchQuiz() {
                     <FormItem>
                       <FormLabel>What's your budget?</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., $500 - $1000" {...field} />
+                        <Input placeholder="e.g., ₹50,000 - ₹1,00,000" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

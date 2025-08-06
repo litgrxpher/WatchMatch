@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -22,7 +23,7 @@ const WatchMatchQuizInputSchema = z.object({
   stylePreferences: z
     .string()
     .describe('Describe your style preferences (e.g., classic, modern, sporty).'),
-  budget: z.string().describe('What is your budget range for a watch?'),
+  budget: z.string().describe('What is your budget range for a watch? This will be in Indian Rupees (INR).'),
   desiredFeatures: z
     .string()
     .describe(
@@ -55,7 +56,7 @@ const watchMatchQuizPrompt = ai.definePrompt({
   name: 'watchMatchQuizPrompt',
   input: {schema: WatchMatchQuizInputSchema},
   output: {schema: WatchMatchQuizOutputSchema},
-  prompt: `You are a personal watch consultant AI assistant. Given the users preferences, suggest a list of watches that they should consider.
+  prompt: `You are a personal watch consultant AI assistant. Given the users preferences, suggest a list of watches that they should consider. The user has specified their budget in Indian Rupees (INR).
 
 Lifestyle: {{{lifestyle}}}
 Style Preferences: {{{stylePreferences}}}
