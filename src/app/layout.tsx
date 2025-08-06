@@ -4,7 +4,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'WatchSavvy AI',
+  title: 'WatchBuddy',
   description: 'Find your perfect watch with AI',
 };
 
