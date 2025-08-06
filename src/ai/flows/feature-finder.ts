@@ -22,7 +22,7 @@ const prompt = ai.definePrompt({
   output: {schema: FeatureFinderOutputSchema},
   prompt: `You are an expert watch concierge. Based on the user's criteria, suggest up to 8 specific watch models (brand and name).
 For each suggestion, provide a brief, one-sentence reason why it's a good fit.
-If a filter is set to 'all' or 'any', it means the user has no preference for that category.
+If a filter is set to 'all', 'any', or is an empty string, it means the user has no preference for that category.
 The user has specified the price in Indian Rupees (INR).
 
 User Criteria:

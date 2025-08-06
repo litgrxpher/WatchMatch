@@ -13,10 +13,12 @@ import { featureFinder } from '@/ai/flows/feature-finder';
 import type { FeatureFinderOutput, FeatureFinderInput } from '@/ai/schemas/feature-finder-schemas';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { Input } from './ui/input';
 
 const featureOptions = ['Chronograph', 'GMT', 'Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 'Power Reserve Indicator'];
 const healthFeatureOptions = ['Heart Rate Monitor', 'SpO2 Sensor', 'Sleep Tracking', 'ECG', 'GPS'];
 
+const OTHER_VALUE = '--other--';
 
 export function AdvancedWatchFilter() {
   const [filters, setFilters] = useState<FeatureFinderInput>({
@@ -31,6 +33,17 @@ export function AdvancedWatchFilter() {
     priceRange: [0, 500000],
     caseSize: [36, 44],
   });
+  
+  const [otherValues, setOtherValues] = useState({
+    movement: '',
+    material: '',
+    style: '',
+    dialColor: '',
+    strapType: '',
+    waterResistance: '',
+    glassType: '',
+  });
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FeatureFinderOutput | null>(null);
   const { toast } = useToast();
@@ -53,15 +66,27 @@ export function AdvancedWatchFilter() {
     });
   };
 
-  const handleFilterChange = (key: keyof FeatureFinderInput, value: any) => {
+  const handleFilterChange = (key: keyof Omit<FeatureFinderInput, 'features' | 'priceRange' | 'caseSize'>, value: any) => {
       setFilters(prev => ({...prev, [key]: value}));
+  }
+  
+  const handleOtherValueChange = (key: keyof typeof otherValues, value: string) => {
+    setOtherValues(prev => ({...prev, [key]: value}));
   }
 
   const handleSearch = async () => {
     setLoading(true);
     setResult(null);
+
+    const finalFilters = { ...filters };
+    for (const key in otherValues) {
+        if (filters[key as keyof typeof filters] === OTHER_VALUE) {
+            finalFilters[key as keyof typeof finalFilters] = otherValues[key as keyof typeof otherValues];
+        }
+    }
+
     try {
-      const searchResult = await featureFinder(filters);
+      const searchResult = await featureFinder(finalFilters);
       setResult(searchResult);
     } catch (e) {
       console.error(e);
@@ -88,6 +113,15 @@ export function AdvancedWatchFilter() {
       priceRange: [0, 500000],
       caseSize: [36, 44],
     });
+    setOtherValues({
+        movement: '',
+        material: '',
+        style: '',
+        dialColor: '',
+        strapType: '',
+        waterResistance: '',
+        glassType: '',
+    });
     setResult(null);
   }
 
@@ -104,7 +138,7 @@ export function AdvancedWatchFilter() {
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
             {/* Filters */}
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="movement">Movement</Label>
               <Select value={filters.movement} onValueChange={(v) => handleFilterChange('movement', v)}>
                 <SelectTrigger id="movement"><SelectValue placeholder="Select movement" /></SelectTrigger>
@@ -114,10 +148,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Quartz">Quartz</SelectItem>
                   <SelectItem value="Manual">Manual Wind</SelectItem>
                   <SelectItem value="Smart">Smart</SelectItem>
+                  <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+              {filters.movement === OTHER_VALUE && (
+                  <Input placeholder="Specify movement" value={otherValues.movement} onChange={(e) => handleOtherValueChange('movement', e.target.value)} />
+              )}
             </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="material">Case Material</Label>
               <Select value={filters.material} onValueChange={(v) => handleFilterChange('material', v)}>
                 <SelectTrigger id="material"><SelectValue placeholder="Select material" /></SelectTrigger>
@@ -130,10 +168,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Gold">Gold</SelectItem>
                   <SelectItem value="Bronze">Bronze</SelectItem>
                   <SelectItem value="Platinum">Platinum</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+              {filters.material === OTHER_VALUE && (
+                <Input placeholder="Specify material" value={otherValues.material} onChange={(e) => handleOtherValueChange('material', e.target.value)} />
+              )}
             </div>
-             <div>
+             <div className='space-y-2'>
               <Label htmlFor="style">Style</Label>
               <Select value={filters.style} onValueChange={(v) => handleFilterChange('style', v)}>
                 <SelectTrigger id="style"><SelectValue placeholder="Select style" /></SelectTrigger>
@@ -145,10 +187,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Field">Field</SelectItem>
                   <SelectItem value="Racing">Racing</SelectItem>
                   <SelectItem value="Minimalist">Minimalist</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+               {filters.style === OTHER_VALUE && (
+                <Input placeholder="Specify style" value={otherValues.style} onChange={(e) => handleOtherValueChange('style', e.target.value)} />
+              )}
             </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="dialColor">Dial Color</Label>
               <Select value={filters.dialColor} onValueChange={(v) => handleFilterChange('dialColor', v)}>
                 <SelectTrigger id="dialColor"><SelectValue placeholder="Select dial color" /></SelectTrigger>
@@ -161,10 +207,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Silver">Silver</SelectItem>
                   <SelectItem value="Red">Red</SelectItem>
                   <SelectItem value="Brown">Brown</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+               {filters.dialColor === OTHER_VALUE && (
+                <Input placeholder="Specify dial color" value={otherValues.dialColor} onChange={(e) => handleOtherValueChange('dialColor', e.target.value)} />
+              )}
             </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="strapType">Strap Type</Label>
               <Select value={filters.strapType} onValueChange={(v) => handleFilterChange('strapType', v)}>
                 <SelectTrigger id="strapType"><SelectValue placeholder="Select strap type" /></SelectTrigger>
@@ -175,10 +225,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Rubber">Rubber</SelectItem>
                   <SelectItem value="NATO/nylon">NATO/Nylon</SelectItem>
                   <SelectItem value="Ceramic">Ceramic</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+               {filters.strapType === OTHER_VALUE && (
+                <Input placeholder="Specify strap type" value={otherValues.strapType} onChange={(e) => handleOtherValueChange('strapType', e.target.value)} />
+              )}
             </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="waterResistance">Water Resistance</Label>
               <Select value={filters.waterResistance} onValueChange={(v) => handleFilterChange('waterResistance', v)}>
                 <SelectTrigger id="waterResistance"><SelectValue placeholder="Select water resistance" /></SelectTrigger>
@@ -188,10 +242,14 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="50m">50m (Light swimming)</SelectItem>
                   <SelectItem value="100m">100m (Swimming/Snorkeling)</SelectItem>
                   <SelectItem value="200m+">200m+ (Diving)</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+               {filters.waterResistance === OTHER_VALUE && (
+                <Input placeholder="Specify water resistance" value={otherValues.waterResistance} onChange={(e) => handleOtherValueChange('waterResistance', e.target.value)} />
+              )}
             </div>
-            <div>
+            <div className='space-y-2'>
               <Label htmlFor="glassType">Glass Type</Label>
               <Select value={filters.glassType} onValueChange={(v) => handleFilterChange('glassType', v)}>
                 <SelectTrigger id="glassType"><SelectValue placeholder="Select glass type" /></SelectTrigger>
@@ -200,14 +258,18 @@ export function AdvancedWatchFilter() {
                   <SelectItem value="Sapphire">Sapphire Crystal</SelectItem>
                   <SelectItem value="Mineral">Mineral Crystal</SelectItem>
                   <SelectItem value="Acrylic">Acrylic</SelectItem>
+                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
                 </SelectContent>
               </Select>
+               {filters.glassType === OTHER_VALUE && (
+                <Input placeholder="Specify glass type" value={otherValues.glassType} onChange={(e) => handleOtherValueChange('glassType', e.target.value)} />
+              )}
             </div>
             <div className="space-y-3">
-              <Label>Price Range: ₹{filters.priceRange[0]} - ₹{filters.priceRange[1] >= 500000 ? '500,000+' : filters.priceRange[1]}</Label>
+              <Label>Price Range: ₹{filters.priceRange[0].toLocaleString()} - ₹{filters.priceRange[1] >= 500000 ? '500,000+' : filters.priceRange[1].toLocaleString()}</Label>
               <Slider
                 value={filters.priceRange}
-                onValueChange={(v) => handleFilterChange('priceRange', v)}
+                onValueChange={(v) => setFilters(prev => ({...prev, priceRange: v}))}
                 min={0}
                 max={500000}
                 step={10000}
@@ -217,7 +279,7 @@ export function AdvancedWatchFilter() {
               <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
               <Slider
                 value={filters.caseSize}
-                onValueChange={(v) => handleFilterChange('caseSize', v)}
+                onValueChange={(v) => setFilters(prev => ({...prev, caseSize: v}))}
                 min={30}
                 max={50}
                 step={1}
@@ -283,9 +345,6 @@ export function AdvancedWatchFilter() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
                     <Card key={watch.name} className="overflow-hidden group">
-                        <div className="relative aspect-[4/3] bg-muted overflow-hidden">
-                          <Image src={watch.imageUrl} alt={`${watch.brand} ${watch.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint="watch"/>
-                        </div>
                         <CardContent className="p-4">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>
