@@ -287,7 +287,7 @@ export function AdvancedWatchFilter() {
             </div>
             
             <div className="md:col-span-3">
-              <Label>Complications (Mechanical/Quartz)</Label>
+              <Label>Complications</Label>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
                 {featureOptions.map(feature => (
                   <div key={feature} className="flex items-center space-x-2">
@@ -341,7 +341,7 @@ export function AdvancedWatchFilter() {
           
           {result && (
              <div className="mt-12">
-                <h2 className="text-2xl font-bold text-center mb-8">AI Watch Suggestions</h2>
+                <h2 className="text-2xl font-bold text-center mb-8">Watch Suggestions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
                     <Card key={watch.name} className="overflow-hidden group flex flex-col bg-transparent backdrop-blur-xl border-white/20 shadow-lg">
