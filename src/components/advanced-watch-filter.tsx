@@ -189,22 +189,10 @@ export function AdvancedWatchFilter() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {result.watches.map(watch => (
                     <Card key={watch.name} className="overflow-hidden group">
-                        <CardContent className="p-0">
-                        <div className="aspect-square overflow-hidden bg-muted">
-                            <Image
-                            src={watch.imageUrl}
-                            alt={`${watch.brand} ${watch.name}`}
-                            width={400}
-                            height={400}
-                            data-ai-hint={`${watch.style} watch`}
-                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
-                        <div className="p-4">
+                        <CardContent className="p-4">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>
                             <p className="text-sm text-muted-foreground mt-1">{watch.reason}</p>
-                        </div>
                         </CardContent>
                     </Card>
                     ))}
