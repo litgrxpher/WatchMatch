@@ -128,7 +128,7 @@ export function AdvancedWatchFilter() {
             </div>
 
             <div className="space-y-3">
-              <Label>Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1] === 5000 ? '5000+' : filters.priceRange[1]}</Label>
+              <Label>Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1] >= 5000 ? '5000+' : filters.priceRange[1]}</Label>
               <Slider
                 value={filters.priceRange}
                 onValueChange={(v) => handleFilterChange('priceRange', v)}

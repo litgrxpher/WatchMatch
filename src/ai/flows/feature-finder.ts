@@ -44,6 +44,11 @@ const featureFinderFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    if (output?.watches) {
+      output.watches.forEach(watch => {
+        watch.imageUrl = "https://placehold.co/400x400.png"
+      })
+    }
     return output!;
   }
 );
