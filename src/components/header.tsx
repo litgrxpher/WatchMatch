@@ -12,7 +12,6 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="#quiz" className="text-muted-foreground hover:text-foreground transition-colors">AI Quiz</a>
           <a href="#filter" className="text-muted-foreground hover:text-foreground transition-colors">Finder</a>
-          <a href="#occasions" className="text-muted-foreground hover:text-foreground transition-colors">Occasions</a>
         </nav>
       </div>
     </header>
