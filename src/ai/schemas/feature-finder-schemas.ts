@@ -15,6 +15,7 @@ const WatchSuggestionSchema = z.object({
   name: z.string().describe("The model name of the suggested watch."),
   style: z.string().describe("The style of the watch (e.g., 'Dive', 'Dress')."),
   reason: z.string().describe("A brief (1 sentence) reason why this watch is a good match."),
+  imageUrl: z.string().url().describe("A URL for a placeholder image of the watch. Use `https://placehold.co/400x400.png`"),
 });
 
 export const FeatureFinderOutputSchema = z.object({

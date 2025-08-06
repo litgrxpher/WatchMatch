@@ -192,7 +192,7 @@ export function AdvancedWatchFilter() {
                         <CardContent className="p-0">
                         <div className="aspect-square overflow-hidden bg-muted">
                             <Image
-                            src={`https://placehold.co/400x400.png`}
+                            src={watch.imageUrl}
                             alt={`${watch.brand} ${watch.name}`}
                             width={400}
                             height={400}

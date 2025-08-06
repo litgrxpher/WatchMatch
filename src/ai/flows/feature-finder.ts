@@ -21,7 +21,7 @@ const prompt = ai.definePrompt({
   input: {schema: FeatureFinderInputSchema},
   output: {schema: FeatureFinderOutputSchema},
   prompt: `You are an expert watch concierge. Based on the user's criteria, suggest up to 8 specific watch models (brand and name).
-For each suggestion, provide a brief, one-sentence reason why it's a good fit.
+For each suggestion, provide a brief, one-sentence reason why it's a good fit, and a placeholder image URL from 'https://placehold.co/400x400.png'.
 If a filter is set to 'all', it means the user has no preference for that category.
 
 User Criteria:
