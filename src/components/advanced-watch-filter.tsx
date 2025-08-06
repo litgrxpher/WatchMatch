@@ -322,9 +322,9 @@ export function AdvancedWatchFilter() {
               </div>
             </div>
           </div>
-           <div className="flex justify-center gap-4">
-                <Button variant="ghost" onClick={resetFilters}>Reset Filters</Button>
-                <Button onClick={handleSearch} disabled={loading} size="lg">
+           <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button variant="ghost" onClick={resetFilters} className="w-full sm:w-auto">Reset Filters</Button>
+                <Button onClick={handleSearch} disabled={loading} size="lg" className="w-full sm:w-auto">
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
