@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Filter, Loader2, Sparkles, Search, Check, ChevronsUpDown, X } from 'lucide-react';
+import { Loader2, Sparkles, Search, Check, ChevronsUpDown, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
@@ -239,7 +239,7 @@ export function AdvancedWatchFilter() {
         <CardHeader>
           <div className="flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full">
-                <Filter className="h-8 w-8 text-primary" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256" className="text-primary"><defs><linearGradient id="logosNextjsIcon0" x1="55.633%" x2="83.228%" y1="56.385%" y2="96.08%"><stop offset="0%" stopColor="currentColor"/><stop offset="100%" stopColor="currentColor" stopOpacity="0"/></linearGradient><linearGradient id="logosNextjsIcon1" x1="50%" x2="49.953%" y1="0%" y2="73.438%"><stop offset="0%" stopColor="currentColor"/><stop offset="100%" stopColor="currentColor" stopOpacity="0"/></linearGradient><circle id="logosNextjsIcon2" cx="128" cy="128" r="128"/></defs><mask id="logosNextjsIcon3" fill="#fff"><use href="#logosNextjsIcon2"/></mask><g mask="url(#logosNextjsIcon3)"><circle cx="128" cy="128" r="128" fill="black"/><path fill="url(#logosNextjsIcon0)" d="M212.634 224.028L98.335 76.8H76.8v102.357h17.228V98.68L199.11 234.446a128 128 0 0 0 13.524-10.418"/><path fill="url(#logosNextjsIcon1)" d="M163.556 76.8h17.067v102.4h-17.067z"/></g></svg>
             </div>
             <div>
                 <CardTitle className="text-3xl font-bold font-headline">WatchMatch AI</CardTitle>
