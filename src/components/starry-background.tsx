@@ -120,18 +120,7 @@ const StarryBackground = () => {
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: radial-gradient(
-              circle at 20% 30%,
-              #0b0c10 0%,
-              #000000 70%,
-              #000000 100%
-            ),
-            radial-gradient(
-              circle at 80% 80%,
-              #1a1a2e 0%,
-              #000000 60%,
-              #000000 100%
-            );
+          background: #000000;
           overflow: hidden;
           z-index: -1;
         }
