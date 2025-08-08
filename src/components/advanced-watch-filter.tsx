@@ -333,8 +333,8 @@ export function AdvancedWatchFilter() {
                         </CardContent>
                         <CardFooter>
                           <Button asChild className="w-full">
-                            <Link href={watch.purchaseUrl} target="_blank" rel="noopener noreferrer">
-                              View Product
+                            <Link href={`https://www.google.com/search?q=${encodeURIComponent(`${watch.brand} ${watch.name}`)}`} target="_blank" rel="noopener noreferrer">
+                              Search on Google
                               <ExternalLink className="ml-2 h-4 w-4" />
                             </Link>
                           </Button>

@@ -22,7 +22,7 @@ const prompt = ai.definePrompt({
   input: {schema: FeatureFinderInputSchema},
   output: {schema: FeatureFinderOutputSchema},
   prompt: `You are an expert watch concierge. Based on the user's criteria, suggest up to 8 specific watch models (brand and name).
-For each suggestion, provide a brief, one-sentence reason why it's a good fit, and a valid URL to a website where the watch can be purchased. When possible, prioritize links from reputable online retailers or the brand's official website.
+For each suggestion, provide a brief, one-sentence reason why it's a good fit.
 If a filter array is empty, it means the user has no preference for that category.
 The user has specified the price in Indian Rupees (INR).
 
