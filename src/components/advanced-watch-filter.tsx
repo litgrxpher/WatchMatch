@@ -271,12 +271,12 @@ export function AdvancedWatchFilter() {
                 <Input
                   type="number"
                   placeholder="Min price"
-                  value={filters.priceRange[0]}
+                  value={filters.priceRange[0] === 0 ? '' : filters.priceRange[0]}
                   onChange={(e) => {
                     const value = e.target.value;
                     setFilters(prev => ({
                       ...prev,
-                      priceRange: [Number(value), prev.priceRange[1]],
+                      priceRange: [value ? Number(value) : 0, prev.priceRange[1]],
                     }));
                   }}
                 />
