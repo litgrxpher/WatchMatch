@@ -132,8 +132,8 @@ export function AdvancedWatchFilter() {
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Filter className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">Feature Finder</CardTitle>
-          <CardDescription className="text-md">Use our extensive filters to find the watch with your exact desired specs.</CardDescription>
+          <CardTitle className="text-3xl font-bold font-headline">WatchMatch</CardTitle>
+          <CardDescription className="text-md">Find your perfect watch by selecting your desired features.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
