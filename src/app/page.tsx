@@ -27,7 +27,7 @@ export default function Home() {
         </div>
         <div className="relative h-96 w-full flex items-center justify-center [perspective:800px]">
           <InteractiveImage
-            src="https://placehold.co/350x350.png"
+            src="/casio-watch.png"
             alt="Casio F-91W watch"
             width={350}
             height={350}
