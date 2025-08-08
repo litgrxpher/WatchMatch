@@ -60,15 +60,6 @@ export function AdvancedWatchFilter() {
   const [result, setResult] = useState<FeatureFinderOutput | null>(null);
   const { toast } = useToast();
 
-  const handleFeatureChange = (feature: string) => {
-    setFilters(prev => {
-        const newFeatures = prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature];
-        return {...prev, features: newFeatures};
-    });
-  };
-
   const handleAddCustomFeature = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && customFeatureInput.trim() !== '') {
         e.preventDefault();
@@ -153,13 +144,10 @@ export function AdvancedWatchFilter() {
 
   const MultiSelect = ({ title, options }: { title: string; options: string[] }) => {
     const selectedFeatures = filters.features.filter(f => options.includes(f));
-    const isOtherSelected = title === 'Features' && isOtherFeatureSelected;
-
+    
     const handleSelect = (option: string) => {
         if (option === OTHER_VALUE) {
-            if(title === 'Features') {
-                setIsOtherFeatureSelected(!isOtherSelected);
-            }
+            setIsOtherFeatureSelected(!isOtherFeatureSelected);
             return;
         }
         setFilters(prev => {
@@ -170,17 +158,20 @@ export function AdvancedWatchFilter() {
         });
     };
 
-    const currentSelection = [
-        ...selectedFeatures,
-        ...(isOtherSelected ? ['Other...'] : [])
-    ];
+    const currentSelectionText = () => {
+        const selection = filters.features.filter(f => options.includes(f));
+        if(title === 'Features' && isOtherFeatureSelected) {
+            return [...selection, 'Other...'].join(', ');
+        }
+        return selection.length > 0 ? selection.join(', ') : `Select ${title}`;
+    }
     
     return (
         <Popover>
             <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                     <span className="truncate">
-                        {currentSelection.length > 0 ? currentSelection.join(', ') : `Select ${title}`}
+                        {currentSelectionText()}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -213,7 +204,7 @@ export function AdvancedWatchFilter() {
                                 <Check
                                     className={cn(
                                         "mr-2 h-4 w-4",
-                                        isOtherSelected ? "opacity-100" : "opacity-0"
+                                        isOtherFeatureSelected ? "opacity-100" : "opacity-0"
                                     )}
                                 />
                                 Other...
@@ -230,7 +221,7 @@ export function AdvancedWatchFilter() {
 
   return (
     <section>
-      <Card className="bg-card/10 backdrop-blur-2xl border-white/10 shadow-lg">
+      <Card className="bg-card/30 backdrop-blur-2xl border-white/20 shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
             <Filter className="h-8 w-8 text-primary" />
