@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, Sparkles, Search, Check, ChevronsUpDown, X } from 'lucide-react';
+import { Loader2, Sparkles, Search, Check, ChevronsUpDown, X, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
@@ -333,9 +333,9 @@ export function AdvancedWatchFilter() {
                         </CardContent>
                         <CardFooter>
                           <Button asChild className="w-full">
-                            <Link href={`https://www.google.com/search?q=${encodeURIComponent(watch.brand + ' ' + watch.name)}`} target="_blank" rel="noopener noreferrer">
-                              <Search className="mr-2 h-4 w-4" />
-                              Search on Google
+                            <Link href={watch.purchaseUrl} target="_blank" rel="noopener noreferrer">
+                              View Product
+                              <ExternalLink className="ml-2 h-4 w-4" />
                             </Link>
                           </Button>
                         </CardFooter>
@@ -356,3 +356,5 @@ export function AdvancedWatchFilter() {
     </section>
   );
 }
+
+    
