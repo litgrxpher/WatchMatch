@@ -236,12 +236,18 @@ export function AdvancedWatchFilter() {
   return (
     <section>
       <Card className="bg-card/30 backdrop-blur-2xl border-white/20 shadow-lg">
-        <CardHeader className="text-center">
-          <div className="mx-auto bg-primary/10 p-3 rounded-full mb-4 w-fit">
-            <Filter className="h-8 w-8 text-primary" />
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-full">
+                <Filter className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+                <CardTitle className="text-3xl font-bold font-headline">WatchMatch AI</CardTitle>
+                <CardDescription className="text-md text-muted-foreground">
+                    Use our advanced filters to find the perfect watch for you.
+                </CardDescription>
+            </div>
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">WatchMatch</CardTitle>
-          <CardDescription className="text-md">Find your perfect watch by selecting your desired features.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
