@@ -1,17 +1,45 @@
 
 import { AdvancedWatchFilter } from '@/components/advanced-watch-filter';
+import { Button } from '@/components/ui/button';
+import { ArrowDown } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 font-headline [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">Find Your Perfect Timepiece</h1>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto [text-shadow:0_1px_8px_rgba(0,0,0,0.8)]">
-          Whether you're a seasoned collector or a first-time buyer, our AI-powered tools help you discover the watch that's right for you.
-        </p>
+      <section className="grid md:grid-cols-2 items-center gap-12 mb-24 animate-fade-in">
+        <div className="text-center md:text-left">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6 font-headline [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
+            Discover Your
+            <br />
+            <span className="text-primary">Perfect Timepiece</span>
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto md:mx-0 mb-8 [text-shadow:0_1px_8px_rgba(0,0,0,0.8)]">
+            Whether you're a seasoned collector or a first-time buyer, our AI-powered tools help you discover the watch that's right for you.
+          </p>
+          <Link href="#watch-filter">
+            <Button size="lg">
+              Start Your Search
+              <ArrowDown className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+        <div className="relative h-80 md:h-full w-full flex items-center justify-center">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl"></div>
+            <Image
+                src="https://placehold.co/600x600.png"
+                alt="Luxury watch"
+                width={600}
+                height={600}
+                data-ai-hint="luxury watch"
+                className="rounded-full object-cover z-10 shadow-2xl shadow-primary/20"
+                priority
+            />
+        </div>
       </section>
 
-      <div>
+      <div id="watch-filter">
         <AdvancedWatchFilter />
       </div>
     </div>
