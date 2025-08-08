@@ -2,8 +2,8 @@
 import { AdvancedWatchFilter } from '@/components/advanced-watch-filter';
 import { Button } from '@/components/ui/button';
 import { ArrowDown } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { InteractiveImage } from '@/components/interactive-image';
 
 export default function Home() {
   return (
@@ -25,17 +25,13 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-        <div className="relative h-80 md:h-full w-full flex items-center justify-center">
-            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl"></div>
-            <Image
-                src="https://placehold.co/600x600.png"
-                alt="Luxury watch"
-                width={600}
-                height={600}
-                data-ai-hint="luxury watch"
-                className="rounded-full object-cover z-10 shadow-2xl shadow-primary/20"
-                priority
-            />
+        <div className="relative h-96 w-full flex items-center justify-center [perspective:800px]">
+          <InteractiveImage
+            src="https://placehold.co/600x600.png"
+            alt="Luxury watch"
+            width={350}
+            height={350}
+          />
         </div>
       </section>
 
