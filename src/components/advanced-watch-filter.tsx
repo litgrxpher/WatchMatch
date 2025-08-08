@@ -265,15 +265,35 @@ export function AdvancedWatchFilter() {
                 <Input placeholder="Specify glass type" value={otherValues.glassType} onChange={(e) => handleOtherValueChange('glassType', e.target.value)} />
               )}
             </div>
-            <div className="space-y-3">
-              <Label>Price Range: ₹{filters.priceRange[0].toLocaleString()} - ₹{filters.priceRange[1] >= 500000 ? '500,000+' : filters.priceRange[1].toLocaleString()}</Label>
-              <Slider
-                value={filters.priceRange}
-                onValueChange={(v) => setFilters(prev => ({...prev, priceRange: v}))}
-                min={0}
-                max={500000}
-                step={10000}
-              />
+            <div className="space-y-2">
+              <Label>Price Range (₹)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder="Min price"
+                  value={filters.priceRange[0]}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFilters(prev => ({
+                      ...prev,
+                      priceRange: [Number(value), prev.priceRange[1]],
+                    }));
+                  }}
+                />
+                <span className="text-muted-foreground">-</span>
+                <Input
+                  type="number"
+                  placeholder="Max price"
+                  value={filters.priceRange[1] === 500000 ? '' : filters.priceRange[1]}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFilters(prev => ({
+                      ...prev,
+                      priceRange: [prev.priceRange[0], value ? Number(value) : 500000],
+                    }));
+                  }}
+                />
+              </div>
             </div>
              <div className="space-y-3">
               <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
