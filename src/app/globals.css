@@ -31,7 +31,7 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 0 0% 0%;
+    --background: 0 0% 0%; /* pitch black */
     --foreground: 340 100% 99%;
     --card: 0 0% 7%;
     --card-foreground: 340 100% 99%;
@@ -60,12 +60,13 @@
 
 @layer base {
   html {
-    @apply scroll-smooth;
+    scroll-behavior: smooth;
   }
-  * {
-    @apply border-border;
+  *, *::before, *::after {
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-transparent text-foreground;
+    background-color: transparent;
+    color: hsl(var(--foreground));
   }
 }

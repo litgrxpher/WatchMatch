@@ -1,31 +1,51 @@
-
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 
-const colors = ['#ffffff', '#a0c8ff', '#fff9c4'];
+type Star = {
+  id: number;
+  top: number;
+  left: number;
+  size: number;
+  twinkleDuration: number;
+  delay: number;
+  color: string;
+  blur: number;
+};
+
+type ShootingStar = {
+  id: number;
+  top: number;
+  left: number;
+  duration: number;
+};
+
+const colors = ["#ffffff", "#a0c8ff", "#fff9c4"];
 
 const isMobile = () => {
-  if (typeof window === 'undefined') return false;
-  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (typeof window === "undefined") return false;
+  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
 };
 
 const StarryBackground = () => {
-  const [stars, setStars] = useState<{ id: number; top: number; left: number; size: number; twinkleDuration: number; delay: number; color: string; blur: number; }[]>([]);
-  const [shootingStars, setShootingStars] = useState<{ id: number; top: number; left: number; duration: number; }[]>([]);
+  const [stars, setStars] = useState<Star[]>([]);
+  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
   const starsRef = useRef<HTMLDivElement>(null);
   const swirlRef = useRef<HTMLDivElement>(null);
   const mobile = isMobile();
 
+  // Generate stars
   useEffect(() => {
-    const starCount = mobile ? 100 : 200; // fewer stars on mobile
-    const newStars = [];
+    const starCount = mobile ? 100 : 200;
+    const newStars: Star[] = [];
     for (let i = 0; i < starCount; i++) {
       newStars.push({
         id: i,
         top: Math.random() * 100,
         left: Math.random() * 100,
-        size: (Math.random() * 1.5 + 0.5) * (mobile ? 0.7 : 1), // smaller on mobile
+        size: (Math.random() * 1.5 + 0.5) * (mobile ? 0.7 : 1),
         twinkleDuration: Math.random() * 5 + 3,
         delay: Math.random() * 5,
         color: colors[Math.floor(Math.random() * colors.length)],
@@ -35,10 +55,11 @@ const StarryBackground = () => {
     setStars(newStars);
   }, [mobile]);
 
+  // Shooting stars interval
   useEffect(() => {
     const interval = setInterval(() => {
       const startFromLeft = Math.random() > 0.5;
-      const star = {
+      const star: ShootingStar = {
         id: Date.now(),
         top: startFromLeft ? Math.random() * 50 : 0,
         left: startFromLeft ? 0 : Math.random() * 50,
@@ -53,13 +74,13 @@ const StarryBackground = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Parallax mouse movement effect only on non-mobile
+  // Mouse parallax for desktop
   useEffect(() => {
-    if (mobile) return; // skip mouse parallax on mobile
+    if (mobile) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 20; // reduce intensity a bit
+      const x = (e.clientX / innerWidth - 0.5) * 20;
       const y = (e.clientY / innerHeight - 0.5) * 20;
 
       if (starsRef.current) {
@@ -70,16 +91,14 @@ const StarryBackground = () => {
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mobile]);
 
-  // Scroll-based vertical parallax (both mobile & desktop)
+  // Scroll parallax for all
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-
-      // reduced parallax intensity on mobile
       const starsSpeed = mobile ? 0.15 : 0.3;
       const swirlSpeed = mobile ? 0.08 : 0.15;
 
@@ -87,25 +106,25 @@ const StarryBackground = () => {
       const swirlOffset = scrollY * swirlSpeed;
 
       if (starsRef.current) {
-        starsRef.current.style.setProperty('--scroll-stars', `${starsOffset}px`);
+        starsRef.current.style.setProperty("--scroll-stars", `${starsOffset}px`);
       }
       if (swirlRef.current) {
-        swirlRef.current.style.setProperty('--scroll-swirl', `${swirlOffset}px`);
+        swirlRef.current.style.setProperty("--scroll-swirl", `${swirlOffset}px`);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [mobile]);
 
-  // Slow swirl rotation stored in CSS variable
+  // Slow swirl rotation
   useEffect(() => {
     let rotation = 0;
     const interval = setInterval(() => {
       rotation = (rotation + 0.1) % 360;
       if (swirlRef.current) {
-        swirlRef.current.style.setProperty('--swirl-rotation', `${rotation}deg`);
+        swirlRef.current.style.setProperty("--swirl-rotation", `${rotation}deg`);
       }
     }, 40);
     return () => clearInterval(interval);
@@ -120,20 +139,32 @@ const StarryBackground = () => {
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: #000000;
+          background-color: #000;
           overflow: hidden;
           z-index: -1;
         }
         .swirl {
-          content: '';
+          content: "";
           position: absolute;
           width: 150%;
           height: 150%;
           top: -25%;
           left: -25%;
-          background: radial-gradient(circle at 40% 50%, rgba(255 255 255 / 0.08), transparent 70%),
-            radial-gradient(circle at 60% 60%, rgba(173 216 230 / 0.1), transparent 50%),
-            radial-gradient(circle at 50% 40%, rgba(255 255 255 / 0.05), transparent 60%);
+          background: radial-gradient(
+              circle at 40% 50%,
+              rgba(255 255 255 / 0.08),
+              transparent 70%
+            ),
+            radial-gradient(
+              circle at 60% 60%,
+              rgba(173 216 230 / 0.1),
+              transparent 50%
+            ),
+            radial-gradient(
+              circle at 50% 40%,
+              rgba(255 255 255 / 0.05),
+              transparent 60%
+            );
           filter: blur(60px);
           animation: swirl 120s linear infinite;
           pointer-events: none;
@@ -186,7 +217,7 @@ const StarryBackground = () => {
           will-change: transform, opacity;
         }
         .shooting-star::before {
-          content: '';
+          content: "";
           position: absolute;
           width: 100%;
           height: 100%;
