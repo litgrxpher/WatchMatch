@@ -1,133 +1,134 @@
+
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-
-type Star = {
-  id: number;
-  top: number;
-  left: number;
-  size: number;
-  twinkleDuration: number;
-  delay: number;
-  color: string;
-  blur: number;
-};
-
-const colors = ["#ffffff", "#a0c8ff", "#fff9c4"];
-
-const isMobile = () => {
-  if (typeof window === "undefined") return false;
-  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
-};
+import React, { useEffect, useRef } from "react";
 
 const StarryBackground = () => {
-  const [stars, setStars] = useState<Star[]>([]);
-  const starsRef = useRef<HTMLDivElement>(null);
-  const mobile = isMobile();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: 0, y: 0 });
 
-  // Generate stars
   useEffect(() => {
-    const starCount = mobile ? 100 : 200;
-    const newStars: Star[] = [];
-    for (let i = 0; i < starCount; i++) {
-      newStars.push({
-        id: i,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        size: (Math.random() * 1.5 + 0.5) * (mobile ? 0.7 : 1),
-        twinkleDuration: Math.random() * 5 + 3,
-        delay: Math.random() * 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        blur: Math.random() > 0.7 ? (Math.random() * 1.5 + 0.5) * (mobile ? 0.6 : 1) : 0,
-      });
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let particles: Particle[];
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    class Particle {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.speedY = Math.random() * 0.4 - 0.2;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.size > 0.2) this.size -= 0.01;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+
+      draw() {
+        ctx!.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx!.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx!.lineWidth = 1;
+        ctx!.beginPath();
+        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx!.closePath();
+        ctx!.fill();
+      }
     }
-    setStars(newStars);
-  }, [mobile]);
 
-  // Mouse parallax for desktop
-  useEffect(() => {
-    if (mobile) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 20;
-      const y = (e.clientY / innerHeight - 0.5) * 20;
-
-      if (starsRef.current) {
-        starsRef.current.style.transform = `translate3d(${x * 0.25}px, ${y * 0.25}px, 0)`;
+    const init = () => {
+      particles = [];
+      const numberOfParticles = (canvas.width * canvas.height) / 9000;
+      for (let i = 0; i < numberOfParticles; i++) {
+        particles.push(new Particle());
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mobile]);
+    const handleParticles = () => {
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
 
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
+            ctx!.beginPath();
+            ctx!.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`;
+            ctx!.lineWidth = 0.5;
+            ctx!.moveTo(particles[i].x, particles[i].y);
+            ctx!.lineTo(particles[j].x, particles[j].y);
+            ctx!.stroke();
+            ctx!.closePath();
+          }
+        }
+      }
+    };
+    
+    const animate = () => {
+      ctx!.clearRect(0, 0, canvas.width, canvas.height);
+      handleParticles();
+
+      // Parallax effect
+      const parallaxX = (mouse.current.x - canvas.width / 2) / 20;
+      const parallaxY = (mouse.current.y - canvas.height / 2) / 20;
+      ctx!.translate(-parallaxX, -parallaxY);
+
+      animationFrameId = requestAnimationFrame(animate);
+
+      // Reset transform
+      ctx!.setTransform(1, 0, 0, 1, 0, 0);
+    };
+    
+    const handleMouseMove = (e: MouseEvent) => {
+        mouse.current.x = e.clientX;
+        mouse.current.y = e.clientY;
+    };
+
+    window.addEventListener("resize", () => {
+        resizeCanvas();
+        init();
+    });
+    window.addEventListener("mousemove", handleMouseMove);
+
+    resizeCanvas();
+    init();
+    animate();
+
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   return (
-    <>
-      <style jsx>{`
-        .background {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background-color: #000;
-          overflow: hidden;
-          z-index: -1;
-        }
-        .stars {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          will-change: transform;
-        }
-        .star {
-          position: absolute;
-          border-radius: 50%;
-          opacity: 0.8;
-          animation-name: twinkle;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
-          filter: drop-shadow(0 0 3px currentColor);
-        }
-        @keyframes twinkle {
-          from {
-            opacity: 0.1;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
-
-      <div className="background">
-        <div ref={starsRef} className="stars">
-          {stars.map((star) => (
-            <div
-              key={star.id}
-              className="star"
-              style={{
-                top: `${star.top}vh`,
-                left: `${star.left}vw`,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                animationDuration: `${star.twinkleDuration}s`,
-                animationDelay: `${star.delay}s`,
-                color: star.color,
-                filter: star.blur
-                  ? `drop-shadow(0 0 3px ${star.color}) blur(${star.blur}px)`
-                  : `drop-shadow(0 0 3px ${star.color})`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1, backgroundColor: '#000' }}>
+      <canvas ref={canvasRef} />
+    </div>
   );
 };
 
