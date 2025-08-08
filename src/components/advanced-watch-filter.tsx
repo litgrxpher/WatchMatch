@@ -5,8 +5,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Filter, Loader2, Sparkles, Search } from 'lucide-react';
+import { Filter, Loader2, Sparkles, Search, Check, ChevronsUpDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
@@ -14,9 +13,19 @@ import type { FeatureFinderOutput, FeatureFinderInput } from '@/ai/schemas/featu
 import { useToast } from '@/hooks/use-toast';
 import { Input } from './ui/input';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-const featureOptions = ['Chronograph', 'GMT', 'Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 'Power Reserve Indicator'];
-const healthFeatureOptions = ['Heart Rate Monitor', 'SpO2 Sensor', 'Sleep Tracking', 'ECG', 'GPS'];
+const complicationOptions = [
+  'Chronograph', 'GMT', 'Date', 'Day-Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 
+  'Power Reserve Indicator', 'Alarm', 'Minute Repeater', 'Annual Calendar', 'Equation of Time', 'Flyback Chronograph'
+];
+const smartFeatureOptions = [
+  'Heart Rate Monitor', 'SpO2 Sensor', 'Sleep Tracking', 'ECG', 'GPS', 'NFC Payments', 'Music Storage',
+  'Cellular Connectivity', 'Blood Pressure Monitor', 'Temperature Sensor', 'Fall Detection'
+];
 
 const OTHER_VALUE = '--other--';
 
@@ -57,15 +66,6 @@ export function AdvancedWatchFilter() {
     });
   };
   
-  const handleHealthFeatureChange = (feature: string) => {
-    setFilters(prev => {
-        const newFeatures = prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature];
-        return {...prev, features: newFeatures};
-    });
-  };
-
   const handleFilterChange = (key: keyof Omit<FeatureFinderInput, 'features' | 'priceRange' | 'caseSize'>, value: any) => {
       setFilters(prev => ({...prev, [key]: value}));
   }
@@ -124,6 +124,57 @@ export function AdvancedWatchFilter() {
     });
     setResult(null);
   }
+
+  const MultiSelect = ({ title, options }: { title: string; options: string[] }) => {
+    const selectedFeatures = filters.features.filter(f => options.includes(f));
+
+    const handleSelect = (option: string) => {
+        setFilters(prev => {
+            const newFeatures = prev.features.includes(option)
+                ? prev.features.filter(f => f !== option)
+                : [...prev.features, option];
+            return { ...prev, features: newFeatures };
+        });
+    };
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                    <span className="truncate">
+                        {selectedFeatures.length > 0 ? selectedFeatures.join(', ') : `Select ${title}`}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                    <CommandInput placeholder={`Search ${title}...`} />
+                    <CommandList>
+                        <CommandEmpty>No results found.</CommandEmpty>
+                        <CommandGroup>
+                            {options.map(option => (
+                                <CommandItem
+                                    key={option}
+                                    onSelect={() => handleSelect(option)}
+                                    className="cursor-pointer"
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            selectedFeatures.includes(option) ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {option}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+  };
 
   return (
     <section>
@@ -306,40 +357,14 @@ export function AdvancedWatchFilter() {
               />
             </div>
             
-            <div className="md:col-span-3">
+            <div className="space-y-2">
               <Label>Complications</Label>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                {featureOptions.map(feature => (
-                  <div key={feature} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={feature}
-                      checked={filters.features.includes(feature)}
-                      onCheckedChange={() => handleFeatureChange(feature)}
-                    />
-                    <label htmlFor={feature} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {feature}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <MultiSelect title="Complications" options={complicationOptions} />
             </div>
 
-            <div className="md:col-span-3">
-              <Label>Smartwatch Features</Label>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                {healthFeatureOptions.map(feature => (
-                  <div key={feature} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={feature}
-                      checked={filters.features.includes(feature)}
-                      onCheckedChange={() => handleHealthFeatureChange(feature)}
-                    />
-                    <label htmlFor={feature} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {feature}
-                    </label>
-                  </div>
-                ))}
-              </div>
+            <div className="space-y-2">
+              <Label>Smart Features</Label>
+              <MultiSelect title="Smart Features" options={smartFeatureOptions} />
             </div>
           </div>
            <div className="flex flex-col sm:flex-row justify-center gap-4">
