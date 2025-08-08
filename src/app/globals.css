@@ -68,7 +68,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  body, #vanta-bg {
-    @apply bg-black;
-  }
 }
