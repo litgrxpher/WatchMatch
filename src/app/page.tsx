@@ -1,4 +1,4 @@
-import { WatchMatchQuiz } from '@/components/watch-match-quiz';
+
 import { AdvancedWatchFilter } from '@/components/advanced-watch-filter';
 
 export default function Home() {
@@ -11,8 +11,7 @@ export default function Home() {
         </p>
       </section>
 
-      <div className="space-y-24">
-        <WatchMatchQuiz />
+      <div>
         <AdvancedWatchFilter />
       </div>
     </div>
