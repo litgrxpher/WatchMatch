@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Filter, Loader2, Sparkles, Search, Check, ChevronsUpDown, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -18,6 +17,14 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+const movementOptions = ['Automatic', 'Quartz', 'Manual', 'Smart'];
+const materialOptions = ['Stainless Steel', 'Titanium', 'Gold', 'Ceramic', 'Bronze', 'Carbon fiber', 'Platinum'];
+const styleOptions = ['Dive', 'Dress', 'Pilot', 'Field', 'Racing', 'Minimalist'];
+const dialColorOptions = ['Black', 'Blue', 'White', 'Green', 'Silver', 'Red', 'Brown'];
+const strapTypeOptions = ['Leather', 'Metal bracelet', 'Rubber', 'NATO/nylon', 'Ceramic'];
+const waterResistanceOptions = ['Up to 50m', '100m', '200m+'];
+const glassTypeOptions = ['Sapphire', 'Mineral', 'Acrylic'];
+
 const complicationOptions = [
   'Chronograph', 'GMT', 'Date', 'Day-Date', 'Moonphase', 'Perpetual Calendar', 'Tourbillon', 'Tachymeter', 
   'Power Reserve Indicator', 'Alarm', 'Minute Repeater', 'Annual Calendar', 'Equation of Time', 'Flyback Chronograph'
@@ -29,21 +36,23 @@ const smartFeatureOptions = [
 
 const OTHER_VALUE = '--other--';
 
+type FilterKeys = Omit<FeatureFinderInput, 'priceRange' | 'caseSize'>;
+
 export function AdvancedWatchFilter() {
   const [filters, setFilters] = useState<FeatureFinderInput>({
-    movement: 'all',
-    material: 'all',
-    style: 'all',
-    dialColor: 'all',
-    strapType: 'all',
-    waterResistance: 'any',
-    glassType: 'all',
+    movement: [],
+    material: [],
+    style: [],
+    dialColor: [],
+    strapType: [],
+    waterResistance: [],
+    glassType: [],
     features: [],
     priceRange: [0, 500000],
     caseSize: [36, 44],
   });
   
-  const [otherValues, setOtherValues] = useState({
+  const [otherInputs, setOtherInputs] = useState<{[K in keyof FilterKeys]: string}>({
     movement: '',
     material: '',
     style: '',
@@ -51,57 +60,44 @@ export function AdvancedWatchFilter() {
     strapType: '',
     waterResistance: '',
     glassType: '',
+    features: '',
   });
 
-  const [customFeatureInput, setCustomFeatureInput] = useState('');
-  const [isOtherFeatureSelected, setIsOtherFeatureSelected] = useState(false);
+  const [isOtherSelected, setIsOtherSelected] = useState<{[K in keyof FilterKeys]?: boolean}>({});
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FeatureFinderOutput | null>(null);
   const { toast } = useToast();
 
-  const handleAddCustomFeature = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && customFeatureInput.trim() !== '') {
+  const handleAddCustomValue = (key: keyof FilterKeys, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && otherInputs[key].trim() !== '') {
         e.preventDefault();
-        const newFeature = customFeatureInput.trim();
-        if (!filters.features.includes(newFeature)) {
+        const newValue = otherInputs[key].trim();
+        const currentValues = filters[key] as string[];
+        if (!currentValues.includes(newValue)) {
             setFilters(prev => ({
                 ...prev,
-                features: [...prev.features, newFeature]
+                [key]: [...currentValues, newValue]
             }));
         }
-        setCustomFeatureInput('');
+        setOtherInputs(prev => ({...prev, [key]: ''}));
     }
   };
 
-  const handleRemoveCustomFeature = (feature: string) => {
+  const handleRemoveValue = (key: keyof FilterKeys, value: string) => {
+    const currentValues = filters[key] as string[];
     setFilters(prev => ({
         ...prev,
-        features: prev.features.filter(f => f !== feature)
+        [key]: currentValues.filter(v => v !== value)
     }));
   };
   
-  const handleFilterChange = (key: keyof Omit<FeatureFinderInput, 'features' | 'priceRange' | 'caseSize'>, value: any) => {
-      setFilters(prev => ({...prev, [key]: value}));
-  }
-  
-  const handleOtherValueChange = (key: keyof typeof otherValues, value: string) => {
-    setOtherValues(prev => ({...prev, [key]: value}));
-  }
-
   const handleSearch = async () => {
     setLoading(true);
     setResult(null);
 
-    const finalFilters: FeatureFinderInput = { ...filters };
-    (Object.keys(otherValues) as Array<keyof typeof otherValues>).forEach(key => {
-        if (filters[key] === OTHER_VALUE) {
-            finalFilters[key as keyof FeatureFinderInput] = otherValues[key];
-        }
-    });
-
     try {
-      const searchResult = await featureFinder(finalFilters);
+      const searchResult = await featureFinder(filters);
       setResult(searchResult);
     } catch (e) {
       console.error(e);
@@ -117,53 +113,44 @@ export function AdvancedWatchFilter() {
 
   const resetFilters = () => {
     setFilters({
-      movement: 'all',
-      material: 'all',
-      style: 'all',
-      dialColor: 'all',
-      strapType: 'all',
-      waterResistance: 'any',
-      glassType: 'all',
-      features: [],
-      priceRange: [0, 500000],
-      caseSize: [36, 44],
+        movement: [], material: [], style: [], dialColor: [], strapType: [],
+        waterResistance: [], glassType: [], features: [],
+        priceRange: [0, 500000], caseSize: [36, 44],
     });
-    setOtherValues({
-        movement: '',
-        material: '',
-        style: '',
-        dialColor: '',
-        strapType: '',
-        waterResistance: '',
-        glassType: '',
+    setOtherInputs({
+        movement: '', material: '', style: '', dialColor: '', strapType: '',
+        waterResistance: '', glassType: '', features: ''
     });
-    setCustomFeatureInput('');
-    setIsOtherFeatureSelected(false);
+    setIsOtherSelected({});
     setResult(null);
   }
 
-  const MultiSelect = ({ title, options }: { title: string; options: string[] }) => {
-    const selectedFeatures = filters.features.filter(f => options.includes(f));
+  const MultiSelect = ({ title, options, filterKey }: { title: string; options: string[]; filterKey: keyof FilterKeys }) => {
+    const selectedValues = filters[filterKey] as string[];
     
     const handleSelect = (option: string) => {
         if (option === OTHER_VALUE) {
-            setIsOtherFeatureSelected(!isOtherFeatureSelected);
+            setIsOtherSelected(prev => ({...prev, [filterKey]: !prev[filterKey]}));
             return;
         }
         setFilters(prev => {
-            const newFeatures = prev.features.includes(option)
-                ? prev.features.filter(f => f !== option)
-                : [...prev.features, option];
-            return { ...prev, features: newFeatures };
+            const newValues = selectedValues.includes(option)
+                ? selectedValues.filter(f => f !== option)
+                : [...selectedValues, option];
+            return { ...prev, [filterKey]: newValues };
         });
     };
 
     const currentSelectionText = () => {
-        const selection = filters.features.filter(f => options.includes(f));
-        if(title === 'Features' && isOtherFeatureSelected) {
-            return [...selection, 'Other...'].join(', ');
+        const customValues = selectedValues.filter(v => !options.includes(v));
+        const selection = selectedValues.filter(v => options.includes(v));
+
+        let textParts = [...selection];
+        if (isOtherSelected[filterKey] || customValues.length > 0) {
+            textParts.push('Other...');
         }
-        return selection.length > 0 ? selection.join(', ') : `Select ${title}`;
+        
+        return textParts.length > 0 ? textParts.join(', ') : `Select ${title}`;
     }
     
     return (
@@ -191,7 +178,7 @@ export function AdvancedWatchFilter() {
                                     <Check
                                         className={cn(
                                             "mr-2 h-4 w-4",
-                                            selectedFeatures.includes(option) ? "opacity-100" : "opacity-0"
+                                            selectedValues.includes(option) ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                     {option}
@@ -204,7 +191,7 @@ export function AdvancedWatchFilter() {
                                 <Check
                                     className={cn(
                                         "mr-2 h-4 w-4",
-                                        isOtherFeatureSelected ? "opacity-100" : "opacity-0"
+                                        isOtherSelected[filterKey] ? "opacity-100" : "opacity-0"
                                     )}
                                 />
                                 Other...
@@ -217,7 +204,35 @@ export function AdvancedWatchFilter() {
     );
   };
   
-    const customFeatures = filters.features.filter(f => !complicationOptions.includes(f) && !smartFeatureOptions.includes(f));
+  const CustomInputSection = ({filterKey, title}: {filterKey: keyof FilterKeys, title: string}) => {
+    const customValues = (filters[filterKey] as string[]).filter(v => 
+        ![...movementOptions, ...materialOptions, ...styleOptions, ...dialColorOptions, ...strapTypeOptions, ...waterResistanceOptions, ...glassTypeOptions, ...complicationOptions, ...smartFeatureOptions].includes(v)
+    );
+    
+    if (!isOtherSelected[filterKey] && customValues.length === 0) return null;
+
+    return (
+      <div className="space-y-2">
+          <Label>Other {title}</Label>
+          <Input 
+              placeholder={`Type ${title.toLowerCase()} and press Enter`}
+              value={otherInputs[filterKey]}
+              onChange={(e) => setOtherInputs(prev => ({...prev, [filterKey]: e.target.value}))}
+              onKeyDown={(e) => handleAddCustomValue(filterKey, e)}
+          />
+           <div className="flex flex-wrap gap-1 pt-1">
+              {customValues.map(value => (
+                  <Badge key={value} variant="secondary" className="gap-1">
+                      {value}
+                      <button onClick={() => handleRemoveValue(filterKey, value)} className="rounded-full hover:bg-black/20">
+                          <X className="h-3 w-3" />
+                      </button>
+                  </Badge>
+              ))}
+          </div>
+      </div>
+    );
+  }
 
   return (
     <section>
@@ -231,133 +246,47 @@ export function AdvancedWatchFilter() {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 border-b pb-8">
-            {/* Filters */}
             <div className='space-y-2'>
-              <Label htmlFor="movement">Movement</Label>
-              <Select value={filters.movement} onValueChange={(v) => handleFilterChange('movement', v)}>
-                <SelectTrigger id="movement"><SelectValue placeholder="Select movement" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Movement</SelectItem>
-                  <SelectItem value="Automatic">Automatic</SelectItem>
-                  <SelectItem value="Quartz">Quartz</SelectItem>
-                  <SelectItem value="Manual">Manual Wind</SelectItem>
-                  <SelectItem value="Smart">Smart</SelectItem>
-                  <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-              {filters.movement === OTHER_VALUE && (
-                  <Input placeholder="Specify movement" value={otherValues.movement} onChange={(e) => handleOtherValueChange('movement', e.target.value)} />
-              )}
+              <Label>Movement</Label>
+              <MultiSelect title="Movement" options={movementOptions} filterKey="movement" />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor="material">Case Material</Label>
-              <Select value={filters.material} onValueChange={(v) => handleFilterChange('material', v)}>
-                <SelectTrigger id="material"><SelectValue placeholder="Select material" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Material</SelectItem>
-                  <SelectItem value="Stainless Steel">Stainless Steel</SelectItem>
-                  <SelectItem value="Titanium">Titanium</SelectItem>
-                  <SelectItem value="Ceramic">Ceramic</SelectItem>
-                  <SelectItem value="Carbon Fiber">Carbon Fiber</SelectItem>
-                  <SelectItem value="Gold">Gold</SelectItem>
-                  <SelectItem value="Bronze">Bronze</SelectItem>
-                  <SelectItem value="Platinum">Platinum</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-              {filters.material === OTHER_VALUE && (
-                <Input placeholder="Specify material" value={otherValues.material} onChange={(e) => handleOtherValueChange('material', e.target.value)} />
-              )}
+              <Label>Case Material</Label>
+              <MultiSelect title="Case Material" options={materialOptions} filterKey="material" />
             </div>
              <div className='space-y-2'>
-              <Label htmlFor="style">Style</Label>
-              <Select value={filters.style} onValueChange={(v) => handleFilterChange('style', v)}>
-                <SelectTrigger id="style"><SelectValue placeholder="Select style" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Style</SelectItem>
-                  <SelectItem value="Dive">Dive</SelectItem>
-                  <SelectItem value="Dress">Dress</SelectItem>
-                  <SelectItem value="Pilot">Pilot</SelectItem>
-                  <SelectItem value="Field">Field</SelectItem>
-                  <SelectItem value="Racing">Racing</SelectItem>
-                  <SelectItem value="Minimalist">Minimalist</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-               {filters.style === OTHER_VALUE && (
-                <Input placeholder="Specify style" value={otherValues.style} onChange={(e) => handleOtherValueChange('style', e.target.value)} />
-              )}
+              <Label>Style</Label>
+               <MultiSelect title="Style" options={styleOptions} filterKey="style" />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor="dialColor">Dial Color</Label>
-              <Select value={filters.dialColor} onValueChange={(v) => handleFilterChange('dialColor', v)}>
-                <SelectTrigger id="dialColor"><SelectValue placeholder="Select dial color" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Color</SelectItem>
-                  <SelectItem value="Black">Black</SelectItem>
-                  <SelectItem value="Blue">Blue</SelectItem>
-                  <SelectItem value="White">White</SelectItem>
-                  <SelectItem value="Green">Green</SelectItem>
-                  <SelectItem value="Silver">Silver</SelectItem>
-                  <SelectItem value="Red">Red</SelectItem>
-                  <SelectItem value="Brown">Brown</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-               {filters.dialColor === OTHER_VALUE && (
-                <Input placeholder="Specify dial color" value={otherValues.dialColor} onChange={(e) => handleOtherValueChange('dialColor', e.target.value)} />
-              )}
+              <Label>Dial Color</Label>
+              <MultiSelect title="Dial Color" options={dialColorOptions} filterKey="dialColor" />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor="strapType">Strap Type</Label>
-              <Select value={filters.strapType} onValueChange={(v) => handleFilterChange('strapType', v)}>
-                <SelectTrigger id="strapType"><SelectValue placeholder="Select strap type" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Strap</SelectItem>
-                  <SelectItem value="Leather">Leather</SelectItem>
-                  <SelectItem value="Metal bracelet">Metal Bracelet</SelectItem>
-                  <SelectItem value="Rubber">Rubber</SelectItem>
-                  <SelectItem value="NATO/nylon">NATO/Nylon</SelectItem>
-                  <SelectItem value="Ceramic">Ceramic</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-               {filters.strapType === OTHER_VALUE && (
-                <Input placeholder="Specify strap type" value={otherValues.strapType} onChange={(e) => handleOtherValueChange('strapType', e.target.value)} />
-              )}
+              <Label>Strap Type</Label>
+              <MultiSelect title="Strap Type" options={strapTypeOptions} filterKey="strapType" />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor="waterResistance">Water Resistance</Label>
-              <Select value={filters.waterResistance} onValueChange={(v) => handleFilterChange('waterResistance', v)}>
-                <SelectTrigger id="waterResistance"><SelectValue placeholder="Select water resistance" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">Any</SelectItem>
-                  <SelectItem value="30m">30m (Splash resistant)</SelectItem>
-                  <SelectItem value="50m">50m (Light swimming)</SelectItem>
-                  <SelectItem value="100m">100m (Swimming/Snorkeling)</SelectItem>
-                  <SelectItem value="200m+">200m+ (Diving)</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-               {filters.waterResistance === OTHER_VALUE && (
-                <Input placeholder="Specify water resistance" value={otherValues.waterResistance} onChange={(e) => handleOtherValueChange('waterResistance', e.target.value)} />
-              )}
+              <Label>Water Resistance</Label>
+              <MultiSelect title="Water Resistance" options={waterResistanceOptions} filterKey="waterResistance" />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor="glassType">Glass Type</Label>
-              <Select value={filters.glassType} onValueChange={(v) => handleFilterChange('glassType', v)}>
-                <SelectTrigger id="glassType"><SelectValue placeholder="Select glass type" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="Sapphire">Sapphire Crystal</SelectItem>
-                  <SelectItem value="Mineral">Mineral Crystal</SelectItem>
-                  <SelectItem value="Acrylic">Acrylic</SelectItem>
-                   <SelectItem value={OTHER_VALUE}>Other...</SelectItem>
-                </SelectContent>
-              </Select>
-               {filters.glassType === OTHER_VALUE && (
-                <Input placeholder="Specify glass type" value={otherValues.glassType} onChange={(e) => handleOtherValueChange('glassType', e.target.value)} />
-              )}
+              <Label>Glass Type</Label>
+              <MultiSelect title="Glass Type" options={glassTypeOptions} filterKey="glassType" />
+            </div>
+            <div className="space-y-2">
+              <Label>Complications & Features</Label>
+              <MultiSelect title="Complications & Features" options={[...complicationOptions, ...smartFeatureOptions]} filterKey="features" />
+            </div>
+            <div className="space-y-3">
+              <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
+              <Slider
+                value={filters.caseSize}
+                onValueChange={(v) => setFilters(prev => ({...prev, caseSize: v}))}
+                min={30}
+                max={50}
+                step={1}
+              />
             </div>
             <div className="space-y-2">
               <Label>Price Range (₹)</Label>
@@ -389,47 +318,17 @@ export function AdvancedWatchFilter() {
                 />
               </div>
             </div>
-             <div className="space-y-3">
-              <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
-              <Slider
-                value={filters.caseSize}
-                onValueChange={(v) => setFilters(prev => ({...prev, caseSize: v}))}
-                min={30}
-                max={50}
-                step={1}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Complications</Label>
-              <MultiSelect title="Complications" options={complicationOptions} />
-            </div>
 
-            <div className="space-y-2">
-              <Label>Smart Features</Label>
-              <MultiSelect title="Features" options={smartFeatureOptions} />
+            <div className="md:col-span-2 lg:col-span-3 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <CustomInputSection filterKey="movement" title="Movement" />
+                <CustomInputSection filterKey="material" title="Case Material" />
+                <CustomInputSection filterKey="style" title="Style" />
+                <CustomInputSection filterKey="dialColor" title="Dial Color" />
+                <CustomInputSection filterKey="strapType" title="Strap Type" />
+                <CustomInputSection filterKey="waterResistance" title="Water Resistance" />
+                <CustomInputSection filterKey="glassType" title="Glass Type" />
+                <CustomInputSection filterKey="features" title="Features" />
             </div>
-            {isOtherFeatureSelected && (
-                <div className="space-y-2 md:col-span-2 lg:col-span-1">
-                    <Label>Other Features</Label>
-                    <Input 
-                        placeholder="Type feature and press Enter"
-                        value={customFeatureInput}
-                        onChange={(e) => setCustomFeatureInput(e.target.value)}
-                        onKeyDown={handleAddCustomFeature}
-                    />
-                     <div className="flex flex-wrap gap-1 pt-1">
-                        {customFeatures.map(feature => (
-                            <Badge key={feature} variant="secondary" className="gap-1">
-                                {feature}
-                                <button onClick={() => handleRemoveCustomFeature(feature)} className="rounded-full hover:bg-black/20">
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))}
-                    </div>
-                </div>
-            )}
           </div>
            <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button variant="ghost" onClick={resetFilters} className="w-full sm:w-auto">Reset Filters</Button>

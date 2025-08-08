@@ -22,19 +22,19 @@ const prompt = ai.definePrompt({
   output: {schema: FeatureFinderOutputSchema},
   prompt: `You are an expert watch concierge. Based on the user's criteria, suggest up to 8 specific watch models (brand and name).
 For each suggestion, provide a brief, one-sentence reason why it's a good fit, and a valid URL to a website where the watch can be purchased. When possible, prioritize links from Amazon.in or Flipkart.com.
-If a filter is set to 'all', 'any', or is an empty string, it means the user has no preference for that category.
+If a filter array is empty, it means the user has no preference for that category.
 The user has specified the price in Indian Rupees (INR).
 
 User Criteria:
-- Style: {{{style}}}
-- Movement: {{{movement}}}
-- Material: {{{material}}}
+- Style(s): {{#if style}}{{#each style}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
+- Movement(s): {{#if movement}}{{#each movement}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
+- Material(s): {{#if material}}{{#each material}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
 - Price Range: ₹{{{priceRange.[0]}}} - ₹{{{priceRange.[1]}}}
 - Case Size: {{{caseSize.[0]}}}mm - {{{caseSize.[1]}}}mm
-- Dial Color: {{{dialColor}}}
-- Strap Type: {{{strapType}}}
-- Water Resistance: {{{waterResistance}}}
-- Glass Type: {{{glassType}}}
+- Dial Color(s): {{#if dialColor}}{{#each dialColor}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
+- Strap Type(s): {{#if strapType}}{{#each strapType}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
+- Water Resistance(s): {{#if waterResistance}}{{#each waterResistance}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
+- Glass Type(s): {{#if glassType}}{{#each glassType}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Any{{/if}}
 - Desired Complications and Features: {{#if features}}{{#each features}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified{{/if}}
 
 Provide your response in the requested JSON format.

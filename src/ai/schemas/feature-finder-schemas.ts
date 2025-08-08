@@ -1,13 +1,13 @@
 import {z} from 'zod';
 
 export const FeatureFinderInputSchema = z.object({
-  movement: z.string().describe("The desired watch movement (e.g., 'Automatic', 'Quartz', 'Manual', 'Smart', 'all')."),
-  material: z.string().describe("The desired case material (e.g., 'Stainless Steel', 'Titanium', 'Gold', 'Ceramic', 'Bronze', 'Carbon fiber', 'Platinum', 'all')."),
-  style: z.string().describe("The desired watch style (e.g., 'Dive', 'Dress', 'Pilot', 'Field', 'Racing', 'Minimalist', 'all')."),
-  dialColor: z.string().describe("The desired dial color (e.g., 'Black', 'Blue', 'White', 'Green', 'Silver', 'all')."),
-  strapType: z.string().describe("The desired strap type (e.g., 'Leather', 'Metal bracelet', 'Rubber', 'NATO/nylon', 'Ceramic', 'all')."),
-  waterResistance: z.string().describe("The desired water resistance (e.g., 'Any', 'Up to 50m', '100m', '200m+')."),
-  glassType: z.string().describe("The desired glass type (e.g., 'Sapphire', 'Mineral', 'Acrylic', 'all')."),
+  movement: z.array(z.string()).describe("A list of desired watch movements (e.g., 'Automatic', 'Quartz'). Can be empty."),
+  material: z.array(z.string()).describe("A list of desired case materials (e.g., 'Stainless Steel', 'Titanium'). Can be empty."),
+  style: z.array(z.string()).describe("A list of desired watch styles (e.g., 'Dive', 'Dress'). Can be empty."),
+  dialColor: z.array(z.string()).describe("A list of desired dial colors (e.g., 'Black', 'Blue'). Can be empty."),
+  strapType: z.array(z.string()).describe("A list of desired strap types (e.g., 'Leather', 'Metal bracelet'). Can be empty."),
+  waterResistance: z.array(z.string()).describe("A list of desired water resistance levels (e.g., '100m'). Can be empty."),
+  glassType: z.array(z.string()).describe("A list of desired glass types (e.g., 'Sapphire'). Can be empty."),
   features: z.array(z.string()).describe("A list of desired features/complications (e.g., 'Chronograph', 'GMT'). Can be empty."),
   priceRange: z.array(z.number()).length(2).describe("A tuple representing the minimum and maximum price range. e.g. [500, 2000]"),
   caseSize: z.array(z.number()).length(2).describe("A tuple representing the minimum and maximum case size in millimeters. e.g. [38, 42]"),
