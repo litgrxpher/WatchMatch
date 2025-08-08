@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Montserrat', 'sans-serif'],
-        headline: ['Montserrat', 'sans-serif'],
+        headline: ['GodOfWar', 'Montserrat', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {

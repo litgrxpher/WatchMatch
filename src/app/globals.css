@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: 'GodOfWar';
+    src: url('/fonts/GODOFWAR.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
   :root {
     --background: 340 100% 99%;
     --foreground: 220 2% 15%;
