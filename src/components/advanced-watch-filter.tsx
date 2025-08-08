@@ -59,6 +59,7 @@ const FilterSection = ({
 }) => {
   const [otherInput, setOtherInput] = useState('');
   const [isOtherSelected, setIsOtherSelected] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const handleAddCustomValue = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && otherInput.trim() !== '') {
@@ -94,27 +95,34 @@ const FilterSection = ({
         : [...selectedValues, option];
       return { ...prev, [filterKey]: newValues };
     });
+    setPopoverOpen(false);
   };
 
   const selectedValues = (filters[filterKey] as string[]) || [];
   const customValues = selectedValues.filter(v => !allPresetOptions.includes(v));
 
   const currentSelectionText = () => {
-    let textParts: string[] = selectedValues.filter(v => options.includes(v));
-
+    let textParts: string[] = selectedValues.filter(v => allPresetOptions.includes(v));
+    
     if (customValues.length > 0) {
       textParts = [...textParts, ...customValues.map(v => `"${v}"`)];
     }
-    if (isOtherSelected) {
-      textParts.push('Other...');
+    
+    if (textParts.length > 2) {
+        return `${textParts.slice(0, 2).join(', ')}, +${textParts.length - 2} more`;
     }
+
+    if (isOtherSelected && textParts.length === 0 && customValues.length === 0) {
+      return 'Other...';
+    }
+
     return textParts.length > 0 ? textParts.join(', ') : `Select ${title}`;
   };
 
   return (
     <div className="space-y-2">
       <Label>{title}</Label>
-      <Popover>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-full justify-between">
             <span className="truncate">{currentSelectionText()}</span>
