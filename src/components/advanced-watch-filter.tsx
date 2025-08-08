@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Filter, Loader2, Sparkles, Search, Check, ChevronsUpDown } from 'lucide-react';
+import { Filter, Loader2, Sparkles, Search, Check, ChevronsUpDown, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { featureFinder } from '@/ai/flows/feature-finder';
@@ -53,6 +53,9 @@ export function AdvancedWatchFilter() {
     glassType: '',
   });
 
+  const [customFeatureInput, setCustomFeatureInput] = useState('');
+  const [isOtherFeatureSelected, setIsOtherFeatureSelected] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FeatureFinderOutput | null>(null);
   const { toast } = useToast();
@@ -64,6 +67,27 @@ export function AdvancedWatchFilter() {
         : [...prev.features, feature];
         return {...prev, features: newFeatures};
     });
+  };
+
+  const handleAddCustomFeature = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && customFeatureInput.trim() !== '') {
+        e.preventDefault();
+        const newFeature = customFeatureInput.trim();
+        if (!filters.features.includes(newFeature)) {
+            setFilters(prev => ({
+                ...prev,
+                features: [...prev.features, newFeature]
+            }));
+        }
+        setCustomFeatureInput('');
+    }
+  };
+
+  const handleRemoveCustomFeature = (feature: string) => {
+    setFilters(prev => ({
+        ...prev,
+        features: prev.features.filter(f => f !== feature)
+    }));
   };
   
   const handleFilterChange = (key: keyof Omit<FeatureFinderInput, 'features' | 'priceRange' | 'caseSize'>, value: any) => {
@@ -122,13 +146,22 @@ export function AdvancedWatchFilter() {
         waterResistance: '',
         glassType: '',
     });
+    setCustomFeatureInput('');
+    setIsOtherFeatureSelected(false);
     setResult(null);
   }
 
   const MultiSelect = ({ title, options }: { title: string; options: string[] }) => {
     const selectedFeatures = filters.features.filter(f => options.includes(f));
+    const isOtherSelected = title === 'Features' && isOtherFeatureSelected;
 
     const handleSelect = (option: string) => {
+        if (option === OTHER_VALUE) {
+            if(title === 'Features') {
+                setIsOtherFeatureSelected(!isOtherSelected);
+            }
+            return;
+        }
         setFilters(prev => {
             const newFeatures = prev.features.includes(option)
                 ? prev.features.filter(f => f !== option)
@@ -137,12 +170,17 @@ export function AdvancedWatchFilter() {
         });
     };
 
+    const currentSelection = [
+        ...selectedFeatures,
+        ...(isOtherSelected ? ['Other...'] : [])
+    ];
+    
     return (
         <Popover>
             <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                     <span className="truncate">
-                        {selectedFeatures.length > 0 ? selectedFeatures.join(', ') : `Select ${title}`}
+                        {currentSelection.length > 0 ? currentSelection.join(', ') : `Select ${title}`}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -168,6 +206,18 @@ export function AdvancedWatchFilter() {
                                     {option}
                                 </CommandItem>
                             ))}
+                             <CommandItem
+                                onSelect={() => handleSelect(OTHER_VALUE)}
+                                className="cursor-pointer"
+                            >
+                                <Check
+                                    className={cn(
+                                        "mr-2 h-4 w-4",
+                                        isOtherSelected ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                                Other...
+                            </CommandItem>
                         </CommandGroup>
                     </CommandList>
                 </Command>
@@ -175,6 +225,8 @@ export function AdvancedWatchFilter() {
         </Popover>
     );
   };
+  
+    const customFeatures = filters.features.filter(f => !complicationOptions.includes(f) && !smartFeatureOptions.includes(f));
 
   return (
     <section>
@@ -364,8 +416,29 @@ export function AdvancedWatchFilter() {
 
             <div className="space-y-2">
               <Label>Smart Features</Label>
-              <MultiSelect title="Smart Features" options={smartFeatureOptions} />
+              <MultiSelect title="Features" options={smartFeatureOptions} />
             </div>
+            {isOtherFeatureSelected && (
+                <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                    <Label>Other Features</Label>
+                    <Input 
+                        placeholder="Type feature and press Enter"
+                        value={customFeatureInput}
+                        onChange={(e) => setCustomFeatureInput(e.target.value)}
+                        onKeyDown={handleAddCustomFeature}
+                    />
+                     <div className="flex flex-wrap gap-1 pt-1">
+                        {customFeatures.map(feature => (
+                            <Badge key={feature} variant="secondary" className="gap-1">
+                                {feature}
+                                <button onClick={() => handleRemoveCustomFeature(feature)} className="rounded-full hover:bg-black/20">
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+            )}
           </div>
            <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button variant="ghost" onClick={resetFilters} className="w-full sm:w-auto">Reset Filters</Button>
