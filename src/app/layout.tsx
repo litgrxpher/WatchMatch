@@ -23,7 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <StarryBackground />
-        <div className="flex flex-col min-h-screen relative z-10 bg-transparent">
+        <div className="flex flex-col min-h-screen relative z-10">
           <main className="flex-grow">{children}</main>
           <Footer />
         </div>
