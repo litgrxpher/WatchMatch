@@ -13,13 +13,6 @@ type Star = {
   blur: number;
 };
 
-type ShootingStar = {
-  id: number;
-  top: number;
-  left: number;
-  duration: number;
-};
-
 const colors = ["#ffffff", "#a0c8ff", "#fff9c4"];
 
 const isMobile = () => {
@@ -31,9 +24,7 @@ const isMobile = () => {
 
 const StarryBackground = () => {
   const [stars, setStars] = useState<Star[]>([]);
-  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
   const starsRef = useRef<HTMLDivElement>(null);
-  const swirlRef = useRef<HTMLDivElement>(null);
   const mobile = isMobile();
 
   // Generate stars
@@ -55,25 +46,6 @@ const StarryBackground = () => {
     setStars(newStars);
   }, [mobile]);
 
-  // Shooting stars interval
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const startFromLeft = Math.random() > 0.5;
-      const star: ShootingStar = {
-        id: Date.now(),
-        top: startFromLeft ? Math.random() * 50 : 0,
-        left: startFromLeft ? 0 : Math.random() * 50,
-        duration: Math.random() * 1 + 0.8,
-      };
-      setShootingStars((prev) => [...prev, star]);
-      setTimeout(() => {
-        setShootingStars((prev) => prev.filter((s) => s.id !== star.id));
-      }, (star.duration + 0.3) * 1000);
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, []);
-
   // Mouse parallax for desktop
   useEffect(() => {
     if (mobile) return;
@@ -84,10 +56,7 @@ const StarryBackground = () => {
       const y = (e.clientY / innerHeight - 0.5) * 20;
 
       if (starsRef.current) {
-        starsRef.current.style.transform = `translate3d(${x * 0.25}px, ${y * 0.25}px, 0) translateY(var(--scroll-stars, 0px))`;
-      }
-      if (swirlRef.current) {
-        swirlRef.current.style.transform = `translate3d(${x * 0.1}px, ${y * 0.1}px, 0) translateY(var(--scroll-swirl, 0px)) rotate(calc(var(--swirl-rotation, 0deg)))`;
+        starsRef.current.style.transform = `translate3d(${x * 0.25}px, ${y * 0.25}px, 0)`;
       }
     };
 
@@ -95,40 +64,6 @@ const StarryBackground = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mobile]);
 
-  // Scroll parallax for all
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const starsSpeed = mobile ? 0.15 : 0.3;
-      const swirlSpeed = mobile ? 0.08 : 0.15;
-
-      const starsOffset = scrollY * starsSpeed;
-      const swirlOffset = scrollY * swirlSpeed;
-
-      if (starsRef.current) {
-        starsRef.current.style.setProperty("--scroll-stars", `${starsOffset}px`);
-      }
-      if (swirlRef.current) {
-        swirlRef.current.style.setProperty("--scroll-swirl", `${swirlOffset}px`);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [mobile]);
-
-  // Slow swirl rotation
-  useEffect(() => {
-    let rotation = 0;
-    const interval = setInterval(() => {
-      rotation = (rotation + 0.1) % 360;
-      if (swirlRef.current) {
-        swirlRef.current.style.setProperty("--swirl-rotation", `${rotation}deg`);
-      }
-    }, 40);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <>
@@ -142,42 +77,6 @@ const StarryBackground = () => {
           background-color: #000;
           overflow: hidden;
           z-index: -1;
-        }
-        .swirl {
-          content: "";
-          position: absolute;
-          width: 150%;
-          height: 150%;
-          top: -25%;
-          left: -25%;
-          background: radial-gradient(
-              circle at 40% 50%,
-              rgba(255 255 255 / 0.08),
-              transparent 70%
-            ),
-            radial-gradient(
-              circle at 60% 60%,
-              rgba(173 216 230 / 0.1),
-              transparent 50%
-            ),
-            radial-gradient(
-              circle at 50% 40%,
-              rgba(255 255 255 / 0.05),
-              transparent 60%
-            );
-          filter: blur(60px);
-          animation: swirl 120s linear infinite;
-          pointer-events: none;
-          z-index: -1;
-          will-change: transform;
-        }
-        @keyframes swirl {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
         }
         .stars {
           position: absolute;
@@ -204,44 +103,9 @@ const StarryBackground = () => {
             opacity: 1;
           }
         }
-        .shooting-star {
-          position: absolute;
-          width: 120px;
-          height: 3px;
-          background: linear-gradient(90deg, white, transparent);
-          border-radius: 50%;
-          filter: drop-shadow(0 0 8px white);
-          animation-fill-mode: forwards;
-          animation-timing-function: ease-out;
-          animation-name: shooting;
-          will-change: transform, opacity;
-        }
-        .shooting-star::before {
-          content: "";
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          background: inherit;
-          filter: blur(5px);
-          opacity: 0.6;
-          border-radius: inherit;
-          left: -20px;
-          top: 0;
-        }
-        @keyframes shooting {
-          0% {
-            transform: translate(0, 0) rotate(45deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(350px, 350px) rotate(45deg);
-            opacity: 0;
-          }
-        }
       `}</style>
 
       <div className="background">
-        <div ref={swirlRef} className="swirl" />
         <div ref={starsRef} className="stars">
           {stars.map((star) => (
             <div
@@ -262,18 +126,6 @@ const StarryBackground = () => {
             />
           ))}
         </div>
-
-        {shootingStars.map((star) => (
-          <div
-            key={star.id}
-            className="shooting-star"
-            style={{
-              top: `${star.top}vh`,
-              left: `${star.left}vw`,
-              animationDuration: `${star.duration}s`,
-            }}
-          />
-        ))}
       </div>
     </>
   );
