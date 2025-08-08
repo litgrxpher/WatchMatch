@@ -318,8 +318,8 @@ export function AdvancedWatchFilter() {
              <div className="mt-12">
                 <h2 className="text-2xl font-bold text-center mb-8">Watch Suggestions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {result.watches.map(watch => (
-                    <Card key={watch.name} className="overflow-hidden group flex flex-col bg-transparent backdrop-blur-xl border-white/20 shadow-lg">
+                    {result.watches.map((watch, index) => (
+                    <Card key={`${watch.brand}-${watch.name}-${index}`} className="overflow-hidden group flex flex-col bg-transparent backdrop-blur-xl border-white/20 shadow-lg">
                         <CardContent className="p-4 flex flex-col flex-grow">
                             <p className="text-sm font-medium text-muted-foreground">{watch.brand}</p>
                             <h3 className="text-lg font-semibold">{watch.name}</h3>
