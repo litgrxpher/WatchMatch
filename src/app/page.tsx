@@ -19,7 +19,7 @@ export default function Home() {
             Whether you're a seasoned collector or a first-time buyer, our AI-powered tools help you discover the watch that's right for you.
           </p>
           <Link href="#watch-filter">
-            <Button size="lg">
+            <Button size="lg" className="font-headline">
               Start Your Search
               <ArrowDown className="ml-2 h-5 w-5" />
             </Button>
