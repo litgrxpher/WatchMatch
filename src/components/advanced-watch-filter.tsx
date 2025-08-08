@@ -142,11 +142,22 @@ export function AdvancedWatchFilter() {
     };
 
     const currentSelectionText = () => {
-        const customValues = selectedValues.filter(v => !options.includes(v));
+        const allOptions = [
+            ...movementOptions, ...materialOptions, ...styleOptions, ...dialColorOptions, 
+            ...strapTypeOptions, ...waterResistanceOptions, ...glassTypeOptions, 
+            ...complicationOptions, ...smartFeatureOptions
+        ];
+
+        const customValues = selectedValues.filter(v => !allOptions.includes(v));
         const selection = selectedValues.filter(v => options.includes(v));
 
-        let textParts = [...selection];
-        if (isOtherSelected[filterKey] || customValues.length > 0) {
+        let textParts: string[] = [...selection];
+        
+        if (customValues.length > 0) {
+            textParts = [...textParts, ...customValues.map(v => `"${v}"`)];
+        }
+
+        if (isOtherSelected[filterKey]) {
             textParts.push('Other...');
         }
         
@@ -205,17 +216,20 @@ export function AdvancedWatchFilter() {
   };
   
   const CustomInputSection = ({filterKey, title}: {filterKey: keyof FilterKeys, title: string}) => {
-    const customValues = (filters[filterKey] as string[]).filter(v => 
-        ![...movementOptions, ...materialOptions, ...styleOptions, ...dialColorOptions, ...strapTypeOptions, ...waterResistanceOptions, ...glassTypeOptions, ...complicationOptions, ...smartFeatureOptions].includes(v)
-    );
+    const allOptions = [
+        ...movementOptions, ...materialOptions, ...styleOptions, ...dialColorOptions, 
+        ...strapTypeOptions, ...waterResistanceOptions, ...glassTypeOptions, 
+        ...complicationOptions, ...smartFeatureOptions
+    ];
+    
+    const customValues = (filters[filterKey] as string[]).filter(v => !allOptions.includes(v));
     
     if (!isOtherSelected[filterKey] && customValues.length === 0) return null;
 
     return (
-      <div className="space-y-2">
-          <Label>Other {title}</Label>
+      <div className="space-y-2 pt-2">
           <Input 
-              placeholder={`Type ${title.toLowerCase()} and press Enter`}
+              placeholder={`Type other ${title.toLowerCase()} and press Enter`}
               value={otherInputs[filterKey]}
               onChange={(e) => setOtherInputs(prev => ({...prev, [filterKey]: e.target.value}))}
               onKeyDown={(e) => handleAddCustomValue(filterKey, e)}
@@ -249,34 +263,42 @@ export function AdvancedWatchFilter() {
             <div className='space-y-2'>
               <Label>Movement</Label>
               <MultiSelect title="Movement" options={movementOptions} filterKey="movement" />
+              <CustomInputSection filterKey="movement" title="Movement" />
             </div>
             <div className='space-y-2'>
               <Label>Case Material</Label>
               <MultiSelect title="Case Material" options={materialOptions} filterKey="material" />
+              <CustomInputSection filterKey="material" title="Case Material" />
             </div>
              <div className='space-y-2'>
               <Label>Style</Label>
                <MultiSelect title="Style" options={styleOptions} filterKey="style" />
+               <CustomInputSection filterKey="style" title="Style" />
             </div>
             <div className='space-y-2'>
               <Label>Dial Color</Label>
               <MultiSelect title="Dial Color" options={dialColorOptions} filterKey="dialColor" />
+              <CustomInputSection filterKey="dialColor" title="Dial Color" />
             </div>
             <div className='space-y-2'>
               <Label>Strap Type</Label>
               <MultiSelect title="Strap Type" options={strapTypeOptions} filterKey="strapType" />
+              <CustomInputSection filterKey="strapType" title="Strap Type" />
             </div>
             <div className='space-y-2'>
               <Label>Water Resistance</Label>
               <MultiSelect title="Water Resistance" options={waterResistanceOptions} filterKey="waterResistance" />
+              <CustomInputSection filterKey="waterResistance" title="Water Resistance" />
             </div>
             <div className='space-y-2'>
               <Label>Glass Type</Label>
               <MultiSelect title="Glass Type" options={glassTypeOptions} filterKey="glassType" />
+              <CustomInputSection filterKey="glassType" title="Glass Type" />
             </div>
             <div className="space-y-2">
               <Label>Complications & Features</Label>
               <MultiSelect title="Complications & Features" options={[...complicationOptions, ...smartFeatureOptions]} filterKey="features" />
+              <CustomInputSection filterKey="features" title="Features" />
             </div>
             <div className="space-y-3">
               <Label>Case Size: {filters.caseSize[0]}mm - {filters.caseSize[1]}mm</Label>
@@ -317,17 +339,6 @@ export function AdvancedWatchFilter() {
                   }}
                 />
               </div>
-            </div>
-
-            <div className="md:col-span-2 lg:col-span-3 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <CustomInputSection filterKey="movement" title="Movement" />
-                <CustomInputSection filterKey="material" title="Case Material" />
-                <CustomInputSection filterKey="style" title="Style" />
-                <CustomInputSection filterKey="dialColor" title="Dial Color" />
-                <CustomInputSection filterKey="strapType" title="Strap Type" />
-                <CustomInputSection filterKey="waterResistance" title="Water Resistance" />
-                <CustomInputSection filterKey="glassType" title="Glass Type" />
-                <CustomInputSection filterKey="features" title="Features" />
             </div>
           </div>
            <div className="flex flex-col sm:flex-row justify-center gap-4">
