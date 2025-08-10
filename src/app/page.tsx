@@ -8,7 +8,7 @@ import { InteractiveImage } from '@/components/interactive-image';
 export default function Home() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <section className="grid md:grid-cols-2 items-center gap-12 mb-24 animate-fade-in">
+      <section className="grid md:grid-cols-2 items-center gap-8 md:gap-12 mb-16 md:mb-24 animate-fade-in">
         <div className="text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6 font-headline [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
             Discover Your
@@ -25,12 +25,12 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-        <div className="relative h-96 w-full flex items-center justify-center [perspective:800px]">
+        <div className="relative h-80 md:h-96 w-full flex items-center justify-center [perspective:800px]">
           <InteractiveImage
             src="/casio-watch.png"
             alt="Casio F-91W watch"
-            width={350}
-            height={350}
+            width={300}
+            height={300}
           />
         </div>
       </section>
