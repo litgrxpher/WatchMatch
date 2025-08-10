@@ -25,7 +25,7 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-        <div className="relative h-80 md:h-96 w-full flex items-center justify-center [perspective:800px]">
+        <div className="relative h-80 md:h-96 w-full hidden md:flex items-center justify-center [perspective:800px]">
           <InteractiveImage
             src="/casio-watch.png"
             alt="Casio F-91W watch"
