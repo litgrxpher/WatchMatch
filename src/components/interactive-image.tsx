@@ -57,7 +57,7 @@ export function InteractiveImage({ src, alt, width, height }: InteractiveImagePr
         width={width}
         height={height}
         data-ai-hint="Casio watch"
-        className="rounded-full object-cover z-10 shadow-2xl shadow-primary/20 transition-all duration-300 ease-out w-[18.75rem] h-[18.75rem] md:w-[21.875rem] md:h-[21.875rem]"
+        className="rounded-full object-cover z-10 shadow-2xl shadow-primary/20 transition-all duration-300 ease-out w-[15rem] h-[15rem] md:w-[21.875rem] md:h-[21.875rem]"
         style={{
             boxShadow: `
                 0px 0px 5px rgba(255, 255, 255, 0.1),
